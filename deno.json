@@ -12,7 +12,7 @@
     "react-dom": "npm:react-dom@^19.2.4"
   },
   "deploy": {
-    "build": "deno run --unstable-bundle --allow-write=client.js build.ts",
+    "build": "deno run --unstable-bundle --allow-write=. build.ts",
     "runtime": {
       "entrypoint": "main.tsx"
     }
