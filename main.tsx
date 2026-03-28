@@ -1,14 +1,26 @@
 import React from "react";
 import { renderToReadableStream } from "react-dom/server";
 import { ImageResponse } from "@vercel/og";
+import { Clock24 } from "./clock.tsx";
+import clientJs from "./client.js" with { type: "text" };
+import clientSha256 from "./client.sha256" with { type: "text" };
 
 export default {
   async fetch(request) {
     const url = new URL(request.url);
     switch (url.pathname) {
       case "/":
-        return new Response(await renderToReadableStream(<Html />), {
-          headers: { "Content-Type": "text/html; charset=utf-8" },
+        return new Response(
+          await renderToReadableStream(<Html />, {
+            bootstrapModules: [`/client-${clientSha256}`],
+          }),
+          {
+            headers: { "Content-Type": "text/html; charset=utf-8" },
+          },
+        );
+      case `/client-${clientSha256}`:
+        return new Response(clientJs, {
+          headers: { "Content-Type": "application/javascript; charset=utf-8" },
         });
       case "/og-image":
         return new ImageResponse(
@@ -42,11 +54,16 @@ export default {
 function Html() {
   return (
     <html>
-      <head>
-        <title>10000日</title>
-      </head>
       <body>
-        <h1>10000日</h1>
+        <div id="app">
+          <Clock24
+            parameter={{
+              message: "",
+              deadline: undefined,
+            }}
+            onChangeUrl={() => {}}
+          />
+        </div>
       </body>
     </html>
   );
