@@ -21,3 +21,5 @@ await Deno.writeTextFile(
     omitPadding: true,
   }),
 );
+
+console.log("build success");

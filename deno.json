@@ -14,7 +14,8 @@
   "deploy": {
     "build": "deno run --unstable-bundle --allow-write=. build.ts",
     "runtime": {
-      "entrypoint": "main.tsx"
+      "entrypoint": "main.tsx",
+      "args": ["--unstable-raw-imports"]
     }
   }
 }
