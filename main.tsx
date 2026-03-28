@@ -2,8 +2,9 @@ import React from "react";
 import { renderToReadableStream } from "react-dom/server";
 import { ImageResponse } from "@vercel/og";
 import { Clock24 } from "./clock.tsx";
-import clientJs from "./client.js" with { type: "text" };
-import clientSha256 from "./client.sha256" with { type: "text" };
+
+const clientJs = await Deno.readTextFile("./client.js");
+const clientSha256 = await Deno.readTextFile("./client.sha256");
 
 export default {
   async fetch(request) {
