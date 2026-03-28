@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+    "lib": ["deno.ns", "dom"]
   },
   "imports": {
     "@types/react": "npm:@types/react@^19.2.14",

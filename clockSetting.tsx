@@ -1,15 +1,6 @@
 import React from "react";
 import { Clock24Parameter } from "./url.ts";
 
-const StyledLabelText = styled("div", {
-  width: 80,
-});
-
-const StyledInput = styled("input", {
-  padding: 4,
-  fontSize: 16,
-});
-
 const getTimezoneOffsetText = (): string => {
   const timezoneOffset = new Date().getTimezoneOffset();
   const isPlus = timezoneOffset <= 0;
@@ -66,8 +57,9 @@ export const ClockSetting = (
           alignItems: "center",
         }}
       >
-        <StyledLabelText>date</StyledLabelText>
-        <StyledInput
+        <div style={{ width: 80 }}>date</div>
+        <input
+          style={{ padding: 4, fontSize: 16 }}
           type="datetime-local"
           value={props.parameter.deadline === undefined
             ? undefined
@@ -89,8 +81,9 @@ export const ClockSetting = (
           alignItems: "center",
         }}
       >
-        <StyledLabelText>message</StyledLabelText>
-        <StyledInput
+        <div style={{ width: 80 }}>message</div>
+        <input
+          style={{ padding: 4, fontSize: 16 }}
           type="text"
           value={props.parameter.message}
           onChange={(e) => {

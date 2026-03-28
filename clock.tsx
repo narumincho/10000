@@ -1,43 +1,9 @@
 import React from "react";
 import { ClockSetting } from "./clockSetting.tsx";
-import { Clock24Parameter } from "./url.ts";
-
-const Container = styled("div", {
-  backgroundColor: "#724242",
-  height: "100%",
-  display: "grid",
-});
-
-const StyledSvg = styled("svg", {
-  gridColumn: "1 / 2",
-  gridRow: "1 / 2",
-  width: "100%",
-  height: "100%",
-  display: "grid",
-});
-
-const StyledButtonContainer = styled("div", {
-  gridColumn: "1 / 2",
-  gridRow: "1 / 2",
-  justifySelf: "end",
-  zIndex: "1",
-});
-
-const StyledButton = styled("button", {
-  padding: 16,
-  cursor: "pointer",
-  backgroundColor: "black",
-  fontSize: 24,
-});
-
-const StyledSetting = styled("div", {
-  gridColumn: "1 / 2",
-  gridRow: "1 / 2",
-  backdropFilter: "blur(8px)",
-});
+import { Clock24Parameter, Deadline } from "./url.ts";
 
 const useAnimationFrame = (callback = () => {}) => {
-  const reqIdRef = React.useRef<number>();
+  const reqIdRef = React.useRef<number>(undefined);
   const loop = React.useCallback(() => {
     reqIdRef.current = requestAnimationFrame(loop);
     callback();
@@ -79,8 +45,19 @@ export const Clock24 = (
     : timeToDisplayText(props.parameter.deadline);
 
   return (
-    <Container>
-      <StyledSvg viewBox="-100 -100 200 200">
+    <div
+      style={{ backgroundColor: "#724242", height: "100%", display: "grid" }}
+    >
+      <svg
+        style={{
+          gridColumn: "1 / 2",
+          gridRow: "1 / 2",
+          width: "100%",
+          height: "100%",
+          display: "grid",
+        }}
+        viewBox="-100 -100 200 200"
+      >
         <circle cx={0} cy={0} r={93} stroke="#ca8484" fill="#b56566" />
         {Array.from({ length: 24 }).map((_, index) => {
           const angle = index / 24 * Math.PI * 2 - Math.PI / 2;
@@ -188,24 +165,43 @@ export const Clock24 = (
             "0",
           )}:{(Math.floor(seconds / (1000)) % 60).toString().padStart(2, "0")}
         </text>
-      </StyledSvg>
+      </svg>
       {isSettingMode
         ? (
-          <StyledSetting>
+          <div
+            style={{
+              gridColumn: "1 / 2",
+              gridRow: "1 / 2",
+              backdropFilter: "blur(8px)",
+            }}
+          >
             <ClockSetting {...props} />
-          </StyledSetting>
+          </div>
         )
         : <></>}
-      <StyledButtonContainer>
-        <StyledButton
+      <div
+        style={{
+          gridColumn: "1 / 2",
+          gridRow: "1 / 2",
+          justifySelf: "end",
+          zIndex: "1",
+        }}
+      >
+        <button
+          style={{
+            padding: 16,
+            cursor: "pointer",
+            backgroundColor: "black",
+            fontSize: 24,
+          }}
           onClick={() => {
             setIsSettingMode((prev) => !prev);
           }}
         >
           ⚙️
-        </StyledButton>
-      </StyledButtonContainer>
-    </Container>
+        </button>
+      </div>
+    </div>
   );
 };
 
