@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+    "lib": ["deno.ns", "deno.unstable", "dom"]
   },
   "imports": {
     "@types/react": "npm:@types/react@^19.2.14",
@@ -9,5 +10,12 @@
     "@vercel/og": "npm:@vercel/og@^0.11.1",
     "react": "npm:react@^19.2.4",
     "react-dom": "npm:react-dom@^19.2.4"
+  },
+  "deploy": {
+    "build": "deno run --unstable-bundle --allow-write=. build.ts",
+    "runtime": {
+      "entrypoint": "main.tsx",
+      "args": ["--unstable-raw-imports"]
+    }
   }
 }
