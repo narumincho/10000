@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ClockSetting } from "./clockSetting.tsx";
-import { Clock24Parameter, Deadline } from "./url.ts";
+import { UrlParameter } from "./url.ts";
 
-const useAnimationFrame = (callback = () => {}) => {
+function useAnimationFrame(callback = () => {}) {
   const reqIdRef = React.useRef<number>(undefined);
   const loop = React.useCallback(() => {
     reqIdRef.current = requestAnimationFrame(loop);
@@ -17,32 +17,58 @@ const useAnimationFrame = (callback = () => {}) => {
       }
     };
   }, [loop]);
-};
+}
 
-/**
- * 数値の整数部分を取り除く
- */
-const removeInt = (value: number): number => {
-  return value - Math.floor(value);
-};
-
-export const Clock24 = (
-  props: {
-    readonly parameter: Clock24Parameter;
-    readonly onChangeUrl: (newURL: URL) => void;
+export function Clock24(
+  { parameter, initialInstant, onChangeUrl }: {
+    readonly parameter: UrlParameter;
+    readonly initialInstant: Temporal.Instant;
+    readonly onChangeUrl: (newURL: UrlParameter) => void;
   },
-): React.ReactElement => {
+) {
+  const [timezone, setTImezone] = React.useState<string | undefined>(
+    parameter.timezone,
+  );
+  useEffect(() => {
+    setTImezone(Temporal.Now.timeZoneId());
+  });
+
+  if (!timezone) {
+    return <div>loading timezone...</div>;
+  }
+  return (
+    <Clock24WithTimezone
+      message={parameter.message}
+      timezone={timezone}
+      targetDate={parameter.targetDate}
+      initialInstant={initialInstant}
+      onChangeUrl={onChangeUrl}
+    />
+  );
+}
+
+export function Clock24WithTimezone(
+  { message, timezone, targetDate, initialInstant, onChangeUrl }: {
+    readonly message: string;
+    readonly timezone: string;
+    readonly targetDate: Temporal.Instant | undefined;
+    readonly initialInstant: Temporal.Instant;
+    readonly onChangeUrl: (newURL: UrlParameter) => void;
+  },
+) {
   const [isSettingMode, setIsSettingMode] = React.useState<boolean>(false);
-  const [now, setNow] = React.useState<Date>(new Date());
+  const [now, setNow] = React.useState<Temporal.Instant>(initialInstant);
 
   useAnimationFrame(() => {
-    setNow(new Date());
+    setNow(Temporal.Now.instant());
   });
-  const seconds = now.getTime() - now.getTimezoneOffset() * 60 * 1000;
 
-  const limitValueAndUnit = props.parameter.deadline === undefined
+  const zonedNow = now.toZonedDateTimeISO(timezone);
+  const seconds = zonedNow.second;
+
+  const limitValueAndUnit = targetDate === undefined
     ? undefined
-    : timeToDisplayText(props.parameter.deadline);
+    : timeToDisplayText({ targetDate, now });
 
   return (
     <div
@@ -116,7 +142,7 @@ export const Clock24 = (
           strokeWidth={0.5}
           fontSize={18}
         >
-          {props.parameter.message}
+          {message}
         </text>
         {limitValueAndUnit && (
           <text
@@ -145,7 +171,7 @@ export const Clock24 = (
           fontSize={8}
           fontWeight="bold"
         >
-          {now.getFullYear()}/{now.getMonth() + 1}/{now.getDate()}
+          {zonedNow.year}/{zonedNow.month}/{zonedNow.day}
         </text>
         <text
           x={0}
@@ -165,9 +191,12 @@ export const Clock24 = (
             "0",
           )}:{(Math.floor(seconds / (1000)) % 60).toString().padStart(2, "0")}
         </text>
+        <time>
+          {now.toZonedDateTimeISO(timezone).toString()}
+        </time>
       </svg>
-      {isSettingMode
-        ? (
+      {isSettingMode &&
+        (
           <div
             style={{
               gridColumn: "1 / 2",
@@ -175,10 +204,15 @@ export const Clock24 = (
               backdropFilter: "blur(8px)",
             }}
           >
-            <ClockSetting {...props} />
+            <ClockSetting
+              message={message}
+              timezone={timezone}
+              targetDate={targetDate}
+              now={now}
+              onChangeUrl={onChangeUrl}
+            />
           </div>
-        )
-        : <></>}
+        )}
       <div
         style={{
           gridColumn: "1 / 2",
@@ -188,6 +222,7 @@ export const Clock24 = (
         }}
       >
         <button
+          type="button"
           style={{
             padding: 16,
             cursor: "pointer",
@@ -203,16 +238,16 @@ export const Clock24 = (
       </div>
     </div>
   );
-};
+}
 
-export const Needle = (
+export function Needle(
   props: {
     readonly angle0To1: number;
     readonly color: string;
     readonly length: number;
     readonly width: number;
   },
-) => {
+) {
   return (
     <g transform={`rotate(${(props.angle0To1 * 360 + 270) % 360})`}>
       <polygon
@@ -221,20 +256,20 @@ export const Needle = (
       />
     </g>
   );
-};
+}
 
-export const clock24Title = (parameter: Clock24Parameter) => {
+export function clock24Title(parameter: UrlParameter) {
   return parameter.message + " | 1周24時間の時計 | definy";
-};
+}
 
-export const timeToDisplayText = (
-  deadline: Deadline,
+export function timeToDisplayText(
+  { targetDate, now }: { targetDate: Temporal.Instant; now: Temporal.Instant },
 ): {
   readonly value: number;
   readonly unit: string;
   readonly after: boolean;
-} => {
-  const diff = deadline.date.getTime() - deadline.at.getTime();
+} {
+  const diff = targetDate.epochMilliseconds - now.epochMilliseconds;
   const after = diff < 0;
   const diffAbs = Math.abs(diff);
   const diffDay = Math.floor(diffAbs / (1000 * 60 * 60 * 24));
@@ -251,4 +286,4 @@ export const timeToDisplayText = (
   }
   const diffSeconds = Math.floor(diffAbs / 1000);
   return { value: diffSeconds, unit: "秒", after };
-};
+}

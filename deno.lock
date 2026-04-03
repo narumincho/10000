@@ -4,6 +4,7 @@
     "npm:@types/react-dom@^19.2.3": "19.2.3_@types+react@19.2.14",
     "npm:@types/react@^19.2.14": "19.2.14",
     "npm:@vercel/og@~0.11.1": "0.11.1",
+    "npm:navigation-api-types@~0.6.1": "0.6.1",
     "npm:react-dom@^19.2.4": "19.2.4_react@19.2.4",
     "npm:react@^19.2.4": "19.2.4"
   },
@@ -256,6 +257,9 @@
         "unicode-trie"
       ]
     },
+    "navigation-api-types@0.6.1": {
+      "integrity": "sha512-e1BbABfPRKLkBbZfAVuRFR2CLFWOtSt8e0ryJivjvLdw8yxD7ASPgyfl+klcGYvrPcP4zhOtZ4KpmQcEo1FgQw=="
+    },
     "pako@0.2.9": {
       "integrity": "sha512-NUcwaKxUxWrZLpDG+z/xZaCgQITkA/Dv4V/T6bw7VON6l1Xz/VnrBqrYjZQ12TamKHzITTfOEIYUj48y2KXImA=="
     },
@@ -362,6 +366,7 @@
       "npm:@types/react-dom@^19.2.3",
       "npm:@types/react@^19.2.14",
       "npm:@vercel/og@~0.11.1",
+      "npm:navigation-api-types@~0.6.1",
       "npm:react-dom@^19.2.4",
       "npm:react@^19.2.4"
     ]

@@ -1,42 +1,33 @@
 import React from "react";
-import { Clock24Parameter } from "./url.ts";
+import { UrlParameter } from "./url.ts";
 
-const getTimezoneOffsetText = (): string => {
-  const timezoneOffset = new Date().getTimezoneOffset();
-  const isPlus = timezoneOffset <= 0;
-  const timezoneOffsetAbs = Math.abs(timezoneOffset);
+const getTimezoneOffsetText = (
+  timezone: string,
+  now: Temporal.Instant,
+): string => {
+  return `[${timezone}]`;
+  // const timezoneOffset = Temporal.TimeZone.from(timezone)
+  //   .getOffsetNanosecondsFor(
+  //     now,
+  //   );
+  // const isPlus = timezoneOffset <= 0;
+  // const timezoneOffsetAbs = Math.abs(timezoneOffset);
 
-  const offsetHour = Math.floor(timezoneOffsetAbs / 60);
-  const offsetMinute = Math.floor(timezoneOffsetAbs % 60);
+  // const offsetHour = Math.floor(timezoneOffsetAbs / 60);
+  // const offsetMinute = Math.floor(timezoneOffsetAbs % 60);
 
-  return (isPlus ? "+" : "-") + offsetHour.toString().padStart(2, "0") + ":" +
-    offsetMinute.toString().padStart(2, "0");
-};
-
-const updateUrl = (
-  parameter: { readonly dateTimeLocal: string; readonly message: string },
-  onChangeUrl: (newURL: URL) => void,
-): void => {
-  const newUrl = new URL(location.href);
-  newUrl.searchParams.set(
-    "date",
-    parameter.dateTimeLocal + getTimezoneOffsetText(),
-  );
-  newUrl.searchParams.set("message", parameter.message);
-  newUrl.searchParams.set("random", crypto.randomUUID());
-  onChangeUrl(newUrl);
-};
-
-const getLocalIsoDateString = (date: Date): string => {
-  return new Date(
-    date.getTime() - new Date().getTimezoneOffset() * 60 * 1000,
-  ).toISOString().slice(0, 19);
+  // return `[${timezone}] ${isPlus ? "+" : "-"}${
+  //   offsetHour.toString().padStart(2, "0")
+  // }:${offsetMinute.toString().padStart(2, "0")}`;
 };
 
 export const ClockSetting = (
-  props: {
-    readonly parameter: Clock24Parameter;
-    readonly onChangeUrl: (newURL: URL) => void;
+  { message, timezone, targetDate, now, onChangeUrl }: {
+    readonly message: string;
+    readonly timezone: string;
+    readonly targetDate: Temporal.Instant | undefined;
+    readonly now: Temporal.Instant;
+    readonly onChangeUrl: (newURL: UrlParameter) => void;
   },
 ): React.ReactElement => {
   return (
@@ -61,18 +52,18 @@ export const ClockSetting = (
         <input
           style={{ padding: 4, fontSize: 16 }}
           type="datetime-local"
-          value={props.parameter.deadline === undefined
-            ? undefined
-            : getLocalIsoDateString(props.parameter.deadline.date)}
+          value={targetDate?.toZonedDateTimeISO(timezone).toLocaleString()}
           onChange={(e) => {
             const newValue = e.target.value;
-            updateUrl(
-              { dateTimeLocal: newValue, message: props.parameter.message },
-              props.onChangeUrl,
-            );
+
+            const newTargetDate = Temporal.ZonedDateTime.from(
+              newValue + getTimezoneOffsetText(timezone, now),
+            ).toInstant();
+
+            onChangeUrl({ message, timezone, targetDate: newTargetDate });
           }}
         />
-        <div>{getTimezoneOffsetText()}</div>
+        <div>{getTimezoneOffsetText(timezone, now)}</div>
       </label>
       <label
         style={{
@@ -85,17 +76,11 @@ export const ClockSetting = (
         <input
           style={{ padding: 4, fontSize: 16 }}
           type="text"
-          value={props.parameter.message}
+          value={message}
           onChange={(e) => {
             const newMessage = e.target.value;
-            updateUrl(
-              {
-                dateTimeLocal:
-                  props.parameter.deadline?.date?.toLocaleString() ?? "???",
-                message: newMessage,
-              },
-              props.onChangeUrl,
-            );
+
+            onChangeUrl({ message: newMessage, timezone, targetDate });
           }}
         />
       </label>

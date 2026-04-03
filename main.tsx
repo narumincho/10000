@@ -2,6 +2,7 @@ import React from "react";
 import { renderToReadableStream } from "react-dom/server";
 import { ImageResponse } from "@vercel/og";
 import { Clock24 } from "./clock.tsx";
+import { parseUrl } from "./url.ts";
 
 const clientJs = await Deno.readTextFile("./client.js");
 const clientSha256 = await Deno.readTextFile("./client.sha256");
@@ -12,9 +13,12 @@ export default {
     switch (url.pathname) {
       case "/":
         return new Response(
-          await renderToReadableStream(<Html />, {
-            bootstrapModules: [`/client-${clientSha256}`],
-          }),
+          await renderToReadableStream(
+            <Html initialDate={Temporal.Now.instant()} url={url} />,
+            {
+              bootstrapModules: [`/client-${clientSha256}`],
+            },
+          ),
           {
             headers: { "Content-Type": "text/html; charset=utf-8" },
           },
@@ -52,16 +56,16 @@ export default {
   },
 } satisfies Deno.ServeDefaultExport;
 
-function Html() {
+function Html(
+  { initialDate, url }: { initialDate: Temporal.Instant; url: URL },
+) {
   return (
     <html>
       <body>
-        <div id="app">
+        <div id="app" data-initial-date={initialDate.epochMilliseconds}>
           <Clock24
-            parameter={{
-              message: "",
-              deadline: undefined,
-            }}
+            parameter={parseUrl(url)}
+            initialInstant={initialDate}
             onChangeUrl={() => {}}
           />
         </div>
