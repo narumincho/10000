@@ -1,10 +1,14 @@
-import React from "react";
 import { renderToReadableStream } from "react-dom/server";
 import { ImageResponse } from "@vercel/og";
-import { Clock24 } from "./clock.tsx";
+import { Html } from "./html.tsx";
 
-const clientJs = await Deno.readTextFile("./client.js");
-const clientSha256 = await Deno.readTextFile("./client.sha256");
+const scriptName = (await Array.fromAsync(Deno.readDir("./dist/assets")))[0];
+
+if (!scriptName) {
+  throw new Error("client script not found");
+}
+
+const scriptContent = await Deno.readFile(`./dist/assets/${scriptName.name}`);
 
 export default {
   async fetch(request) {
@@ -12,15 +16,19 @@ export default {
     switch (url.pathname) {
       case "/":
         return new Response(
-          await renderToReadableStream(<Html />, {
-            bootstrapModules: [`/client-${clientSha256}`],
-          }),
+          await renderToReadableStream(
+            <Html
+              initialDate={Temporal.Now.instant()}
+              url={url}
+              scriptPath={scriptName.name}
+            />,
+          ),
           {
             headers: { "Content-Type": "text/html; charset=utf-8" },
           },
         );
-      case `/client-${clientSha256}`:
-        return new Response(clientJs, {
+      case `/${scriptName.name}`:
+        return new Response(scriptContent, {
           headers: { "Content-Type": "application/javascript; charset=utf-8" },
         });
       case "/og-image":
@@ -51,21 +59,3 @@ export default {
     return new Response("Not Found", { status: 404 });
   },
 } satisfies Deno.ServeDefaultExport;
-
-function Html() {
-  return (
-    <html>
-      <body>
-        <div id="app">
-          <Clock24
-            parameter={{
-              message: "",
-              deadline: undefined,
-            }}
-            onChangeUrl={() => {}}
-          />
-        </div>
-      </body>
-    </html>
-  );
-}

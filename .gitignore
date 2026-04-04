@@ -1,2 +1,4 @@
-client.js
-client.sha256
+dist.json
+node_modules/
+.vite/
+dist/

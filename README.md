@@ -1,9 +1,7 @@
 # 10000
 
-```sh
-deno run --unstable-bundle --allow-write=. build.ts
-```
+main.tsx SSR の html を提供
 
-```sh
-deno serve --check --watch --unstable-raw-imports -A ./main.tsx
-```
+- 開発時には クライアント `<script type=module src="./client/client.tsx">` を指すが, 本番時には vite によってビルドされたスクリプトを指すようにしたい
+
+アイコンもSSR.
