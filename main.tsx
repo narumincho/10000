@@ -1,7 +1,14 @@
 import { renderToReadableStream } from "react-dom/server";
 import { ImageResponse } from "@vercel/og";
-import dist from "./dist.json" with { type: "json" };
 import { Html } from "./html.tsx";
+
+const scriptName = (await Array.fromAsync(Deno.readDir("./dist/assets")))[0];
+
+if (!scriptName) {
+  throw new Error("client script not found");
+}
+
+const scriptContent = await Deno.readFile(`./dist/assets/${scriptName.name}`);
 
 export default {
   async fetch(request) {
@@ -13,15 +20,15 @@ export default {
             <Html
               initialDate={Temporal.Now.instant()}
               url={url}
-              scriptPath={`/client-${dist.clientHash}`}
+              scriptPath={scriptName.name}
             />,
           ),
           {
             headers: { "Content-Type": "text/html; charset=utf-8" },
           },
         );
-      case `/client-${dist.clientHash}`:
-        return new Response(dist.clientCode, {
+      case `/${scriptName.name}`:
+        return new Response(scriptContent, {
           headers: { "Content-Type": "application/javascript; charset=utf-8" },
         });
       case "/og-image":

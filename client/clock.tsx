@@ -212,6 +212,7 @@ export function Clock24WithTimezone(
           now={now}
           onChangeUrl={onChangeUrl}
         />
+        <None />
       </div>
     </div>
   );
@@ -295,4 +296,10 @@ function Message(
       />
     </foreignObject>
   );
+}
+
+function None() {
+  console.log("render");
+
+  return <div>ok</div>;
 }
