@@ -2,13 +2,18 @@ import { Clock24 } from "./client/clock.tsx";
 import { parseUrl } from "./client/url.ts";
 
 export function Html(
-  { initialDate, url }: { initialDate: Temporal.Instant; url: URL },
+  { initialDate, url, scriptPath }: {
+    initialDate: Temporal.Instant;
+    url: URL;
+    scriptPath: string;
+  },
 ) {
   return (
     <html style={{ height: "100%" }}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script type="module" src={scriptPath} />
       </head>
       <body style={{ height: "100%", margin: 0 }}>
         <div

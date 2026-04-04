@@ -10,10 +10,11 @@ export default {
       case "/":
         return new Response(
           await renderToReadableStream(
-            <Html initialDate={Temporal.Now.instant()} url={url} />,
-            {
-              bootstrapModules: [`/client-${dist.clientHash}`],
-            },
+            <Html
+              initialDate={Temporal.Now.instant()}
+              url={url}
+              scriptPath={`/client-${dist.clientHash}`}
+            />,
           ),
           {
             headers: { "Content-Type": "text/html; charset=utf-8" },

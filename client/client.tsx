@@ -10,16 +10,20 @@ if (!appElement) {
 }
 
 const app = <WithRouter />;
-if (appElement.hasChildNodes()) {
-  hydrateRoot(appElement, app);
+const rootState = globalThis as {
+  __clockAppRoot?: {
+    render: (children: React.ReactNode) => void;
+  };
+};
+if (rootState.__clockAppRoot) {
+  rootState.__clockAppRoot.render(app);
 } else {
-  const root = (globalThis as {
-    __clockAppRoot?: ReturnType<typeof createRoot>;
-  }).__clockAppRoot ?? createRoot(appElement);
-  (globalThis as {
-    __clockAppRoot?: ReturnType<typeof createRoot>;
-  }).__clockAppRoot = root;
-  root.render(app);
+  rootState.__clockAppRoot = appElement.hasChildNodes()
+    ? hydrateRoot(appElement, app)
+    : createRoot(appElement);
+  if (!appElement.hasChildNodes()) {
+    rootState.__clockAppRoot.render(app);
+  }
 }
 
 function WithRouter() {
@@ -53,11 +57,11 @@ function WithRouter() {
       initialInstant={(() => {
         const initialDateText = appElement?.dataset.initialDate;
         if (initialDateText === undefined) {
-          return Temporal.Now.instant();
+          throw new Error("data-initial-date not found");
         }
         const initialDate = Number.parseInt(initialDateText, 10);
         if (Number.isNaN(initialDate)) {
-          return Temporal.Now.instant();
+          throw new Error("data-initial-date is invalid");
         }
         return Temporal.Instant.fromEpochMilliseconds(initialDate);
       })()}

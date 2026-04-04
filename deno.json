@@ -20,11 +20,12 @@
     "vite": "npm:vite@^8.0.3"
   },
   "tasks": {
-    "dev": "deno run -A npm:vite",
+    "dev": "deno run -A ./dev.tsx",
+    "build": "deno run --unstable-bundle --allow-write=./dist.json build.ts",
     "start-watch": "deno serve --check --watch -A ./main.tsx"
   },
   "deploy": {
-    "build": "deno run --unstable-bundle --allow-write=./dist.json build.ts",
+    "build": "deno task build",
     "runtime": {
       "entrypoint": "main.tsx"
     }
