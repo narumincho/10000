@@ -1,22 +1,32 @@
 {
+  "nodeModulesDir": "auto",
   "compilerOptions": {
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    "lib": ["deno.ns", "deno.unstable", "dom"]
+    "lib": ["deno.ns", "deno.unstable", "dom"],
+    "types": ["react", "react-dom", "@types/react"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   },
   "imports": {
+    "@deno/vite-plugin": "npm:@deno/vite-plugin@^2.0.2",
     "@types/react": "npm:@types/react@^19.2.14",
     "@types/react-dom": "npm:@types/react-dom@^19.2.3",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^5.1.0",
     "@vercel/og": "npm:@vercel/og@^0.11.1",
     "navigation-api-types": "npm:navigation-api-types@^0.6.1",
     "react": "npm:react@^19.2.4",
-    "react-dom": "npm:react-dom@^19.2.4"
+    "react-dom": "npm:react-dom@^19.2.4",
+    "vite": "npm:vite@^8.0.3"
+  },
+  "tasks": {
+    "build-client-watch": "deno run --unstable-bundle --watch=./client --allow-write=./dist.json build.ts",
+    "start-watch": "deno serve --check --watch -A ./main.tsx"
   },
   "deploy": {
-    "build": "deno run --unstable-bundle --allow-write=. build.ts",
+    "build": "deno run --unstable-bundle --allow-write=./dist.json build.ts",
     "runtime": {
-      "entrypoint": "main.tsx",
-      "args": ["--unstable-raw-imports"]
+      "entrypoint": "main.tsx"
     }
   }
 }

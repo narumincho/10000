@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { renderToReadableStream } from "react-dom/server";
 import { ImageResponse } from "@vercel/og";
 import { Clock24 } from "./client/clock.tsx";
