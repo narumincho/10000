@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { ClockSetting } from "./clockSetting.tsx";
 import { UrlParameter } from "./url.ts";
 
 function useAnimationFrame(callback = () => {}) {
@@ -78,9 +77,6 @@ export function Clock24WithTimezone(
       style={{
         backgroundColor: "#724242",
         height: "100%",
-        display: "grid",
-        gridAutoRows: "1fr auto",
-        alignItems: "center",
       }}
     >
       <title>{clock24Title({ message, timezone, targetDate })}</title>
@@ -130,10 +126,10 @@ export function Clock24WithTimezone(
         </g>
 
         <Needle
-          angle0To1={elapsedMillisecondsOfDay / (1000 * 60)}
-          color="#FA2222"
-          length={90}
-          width={1}
+          angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60 * 24)}
+          color="#60554A"
+          length={50}
+          width={3}
         />
         <Needle
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60)}
@@ -142,11 +138,12 @@ export function Clock24WithTimezone(
           width={2}
         />
         <Needle
-          angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60 * 24)}
-          color="#60554A"
-          length={50}
-          width={3}
+          angle0To1={elapsedMillisecondsOfDay / (1000 * 60)}
+          color="#FA2222"
+          length={90}
+          width={1}
         />
+
         <Message
           message={message}
           onChange={(newMessage) => {
@@ -204,15 +201,6 @@ export function Clock24WithTimezone(
             .padStart(2, "0")}
         </text>
       </svg>
-      <div style={{ overflow: "auto" }}>
-        <ClockSetting
-          message={message}
-          timezone={timezone}
-          targetDate={targetDate}
-          now={now}
-          onChangeUrl={onChangeUrl}
-        />
-      </div>
     </div>
   );
 }
@@ -236,7 +224,7 @@ export function Needle(
 }
 
 export function clock24Title(parameter: UrlParameter) {
-  return parameter.message + " | 1周24時間の時計";
+  return `${parameter.message ? `${parameter.message} | ` : ""}1周24時間の時計`;
 }
 
 export function timeToDisplayText(
@@ -288,7 +276,16 @@ function Message(
         type="text"
         name="message"
         value={message}
-        style={{ background: "transparent", textAlign: "center" }}
+        style={{
+          background: "transparent",
+          textAlign: "center",
+          border: "none",
+          outline: "none",
+          width: "100%",
+          fontSize: "inherit",
+          fontFamily: "inherit",
+          color: "inherit",
+        }}
         onChange={(e) => {
           onChange(e.target.value);
         }}

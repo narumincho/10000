@@ -18,10 +18,15 @@ function WithRouter() {
 
   useEffect(() => {
     const handler = (event: NavigateEvent) => {
+      if (!event.canIntercept) {
+        return;
+      }
       if (new URL(event.destination.url).pathname !== location.pathname) {
         return;
       }
       event.intercept({
+        focusReset: "manual",
+        scroll: "manual",
         // deno-lint-ignore require-await
         handler: async () => {
           setParameter(parseUrl(new URL(event.destination.url)));
