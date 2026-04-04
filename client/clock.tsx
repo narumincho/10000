@@ -99,8 +99,8 @@ export function Clock24WithTimezone(
             const angle = index / 24 * Math.PI * 2 - Math.PI / 2;
             return (
               <text
-                text-anchor="middle"
-                alignment-baseline="middle"
+                textAnchor="middle"
+                alignmentBaseline="middle"
                 x={Math.cos(angle) * 75}
                 y={Math.sin(angle) * 75}
                 fill="#000"
@@ -204,7 +204,7 @@ export function Clock24WithTimezone(
             .padStart(2, "0")}
         </text>
       </svg>
-      <div style={{ overflow: "auto", padding: "10px" }}>
+      <div style={{ overflow: "auto" }}>
         <ClockSetting
           message={message}
           timezone={timezone}
@@ -212,7 +212,6 @@ export function Clock24WithTimezone(
           now={now}
           onChangeUrl={onChangeUrl}
         />
-        <None />
       </div>
     </div>
   );
@@ -296,10 +295,4 @@ function Message(
       />
     </foreignObject>
   );
-}
-
-function None() {
-  console.log("render");
-
-  return <div>ok</div>;
 }
