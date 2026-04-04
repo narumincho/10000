@@ -20,7 +20,7 @@
     "vite": "npm:vite@^8.0.3"
   },
   "tasks": {
-    "build-client-watch": "deno run --unstable-bundle --watch=./client --allow-write=./dist.json build.ts",
+    "dev": "deno run -A npm:vite",
     "start-watch": "deno serve --check --watch -A ./main.tsx"
   },
   "deploy": {
