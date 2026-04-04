@@ -46,6 +46,7 @@ function WithRouter() {
         Number.parseInt(appElement?.dataset.initialDate ?? "", 10),
       )}
       onChangeUrl={(parameter) => {
+        console.log("onChangeUrl", parameter);
         navigation?.navigate(encodeUrl(parameter), {
           history: "replace",
         });

@@ -1,7 +1,7 @@
 # 10000
 
 ```sh
-deno run --unstable-bundle --allow-write=. build.ts
+deno run --unstable-bundle --watch=./client --allow-write=./dist.json build.ts
 ```
 
 ```sh

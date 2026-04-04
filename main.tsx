@@ -1,11 +1,9 @@
 import React from "react";
 import { renderToReadableStream } from "react-dom/server";
 import { ImageResponse } from "@vercel/og";
-import { Clock24 } from "./clock.tsx";
-import { parseUrl } from "./url.ts";
-
-const clientJs = await Deno.readTextFile("./client.js");
-const clientSha256 = await Deno.readTextFile("./client.sha256");
+import { Clock24 } from "./client/clock.tsx";
+import { parseUrl } from "./client/url.ts";
+import dist from "./dist.json" with { type: "json" };
 
 export default {
   async fetch(request) {
@@ -16,15 +14,15 @@ export default {
           await renderToReadableStream(
             <Html initialDate={Temporal.Now.instant()} url={url} />,
             {
-              bootstrapModules: [`/client-${clientSha256}`],
+              bootstrapModules: [`/client-${dist.clientHash}`],
             },
           ),
           {
             headers: { "Content-Type": "text/html; charset=utf-8" },
           },
         );
-      case `/client-${clientSha256}`:
-        return new Response(clientJs, {
+      case `/client-${dist.clientHash}`:
+        return new Response(dist.clientCode, {
           headers: { "Content-Type": "application/javascript; charset=utf-8" },
         });
       case "/og-image":

@@ -187,13 +187,13 @@ export function Clock24WithTimezone(
         >
           {(Math.floor(elapsedMillisecondsOfDay / (1000 * 60 * 60)) % 24)
             .toString().padStart(
-            2,
-            "0",
-          )}:{(Math.floor(elapsedMillisecondsOfDay / (1000 * 60)) % 60)
+              2,
+              "0",
+            )}:{(Math.floor(elapsedMillisecondsOfDay / (1000 * 60)) % 60)
             .toString().padStart(
-            2,
-            "0",
-          )}:{(Math.floor(elapsedMillisecondsOfDay / (1000)) % 60).toString()
+              2,
+              "0",
+            )}:{(Math.floor(elapsedMillisecondsOfDay / (1000)) % 60).toString()
             .padStart(2, "0")}
         </text>
         <time>
