@@ -26,22 +26,22 @@ export function Clock24(
     readonly onChangeUrl: (newURL: UrlParameter) => void;
   },
 ) {
-  const [timezone, setTimezone] = React.useState<string | undefined>(
-    parameter.timezone,
-  );
   useEffect(() => {
-    if (!timezone) {
-      setTimezone(Temporal.Now.timeZoneId());
+    if (!parameter.timezone) {
+      onChangeUrl({
+        ...parameter,
+        timezone: Temporal.Now.timeZoneId(),
+      });
     }
-  }, []);
+  }, [parameter.timezone, onChangeUrl, parameter]);
 
-  if (!timezone) {
+  if (!parameter.timezone) {
     return <div>loading timezone...</div>;
   }
   return (
     <Clock24WithTimezone
       message={parameter.message}
-      timezone={timezone}
+      timezone={parameter.timezone}
       targetDate={parameter.targetDate}
       initialInstant={initialInstant}
       onChangeUrl={onChangeUrl}
