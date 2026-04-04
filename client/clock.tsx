@@ -98,6 +98,7 @@ export function Clock24WithTimezone(
             const angle = index / 24 * Math.PI * 2 - Math.PI / 2;
             return (
               <text
+                key={index}
                 textAnchor="middle"
                 alignmentBaseline="middle"
                 x={Math.cos(angle) * 75}
@@ -116,6 +117,7 @@ export function Clock24WithTimezone(
             const isFive = index % 5 === 0;
             return (
               <line
+                key={index}
                 x1={Math.cos(angle) * (isFive ? 85 : 87)}
                 y1={Math.sin(angle) * (isFive ? 85 : 87)}
                 x2={Math.cos(angle) * 93}
@@ -146,7 +148,6 @@ export function Clock24WithTimezone(
           width={3}
         />
         <Message
-          key="message"
           message={message}
           onChange={(newMessage) => {
             onChangeUrl({ message: newMessage, timezone, targetDate });
