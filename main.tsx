@@ -58,9 +58,17 @@ function Html(
   { initialDate, url }: { initialDate: Temporal.Instant; url: URL },
 ) {
   return (
-    <html>
-      <body>
-        <div id="app" data-initial-date={initialDate.epochMilliseconds}>
+    <html style={{ height: "100%" }}>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body style={{ height: "100%", margin: 0 }}>
+        <div
+          id="app"
+          data-initial-date={initialDate.epochMilliseconds}
+          style={{ height: "100%" }}
+        >
           <Clock24
             parameter={parseUrl(url)}
             initialInstant={initialDate}

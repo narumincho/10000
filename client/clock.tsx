@@ -26,11 +26,13 @@ export function Clock24(
     readonly onChangeUrl: (newURL: UrlParameter) => void;
   },
 ) {
-  const [timezone, setTImezone] = React.useState<string | undefined>(
+  const [timezone, setTimezone] = React.useState<string | undefined>(
     parameter.timezone,
   );
   useEffect(() => {
-    setTImezone(Temporal.Now.timeZoneId());
+    if (!timezone) {
+      setTimezone(Temporal.Now.timeZoneId());
+    }
   }, []);
 
   if (!timezone) {
@@ -76,6 +78,7 @@ export function Clock24WithTimezone(
     <div
       style={{ backgroundColor: "#724242", height: "100%", display: "grid" }}
     >
+      <title>{clock24Title({ message, timezone, targetDate })}</title>
       <svg
         style={{
           gridColumn: "1 / 2",
@@ -264,7 +267,7 @@ export function Needle(
 }
 
 export function clock24Title(parameter: UrlParameter) {
-  return parameter.message + " | 1周24時間の時計 | definy";
+  return parameter.message + " | 1周24時間の時計";
 }
 
 export function timeToDisplayText(
