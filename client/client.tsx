@@ -21,7 +21,7 @@ function WithRouter() {
 
   React.useEffect(() => {
     const handler = (event: NavigateEvent) => {
-      if (!event.destination.sameDocument) {
+      if (new URL(event.destination.url).pathname !== location.pathname) {
         return;
       }
       event.intercept({
