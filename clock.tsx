@@ -31,7 +31,7 @@ export function Clock24(
   );
   useEffect(() => {
     setTImezone(Temporal.Now.timeZoneId());
-  });
+  }, []);
 
   if (!timezone) {
     return <div>loading timezone...</div>;
@@ -64,7 +64,9 @@ export function Clock24WithTimezone(
   });
 
   const zonedNow = now.toZonedDateTimeISO(timezone);
-  const seconds = zonedNow.second;
+  const elapsedMillisecondsOfDay =
+    (((zonedNow.hour * 60) + zonedNow.minute) * 60 + zonedNow.second) * 1000 +
+    zonedNow.millisecond;
 
   const limitValueAndUnit = targetDate === undefined
     ? undefined
@@ -115,19 +117,19 @@ export function Clock24WithTimezone(
           );
         })}
         <Needle
-          angle0To1={seconds / (1000 * 60)}
+          angle0To1={elapsedMillisecondsOfDay / (1000 * 60)}
           color="#FA2222"
           length={90}
           width={1}
         />
         <Needle
-          angle0To1={seconds / (1000 * 60 * 60)}
+          angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60)}
           color="#FAE080"
           length={70}
           width={2}
         />
         <Needle
-          angle0To1={seconds / (1000 * 60 * 60 * 24)}
+          angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60 * 24)}
           color="#60554A"
           length={50}
           width={3}
@@ -183,13 +185,16 @@ export function Clock24WithTimezone(
           strokeWidth={0.5}
           fontSize={18}
         >
-          {(Math.floor(seconds / (1000 * 60 * 60)) % 24).toString().padStart(
+          {(Math.floor(elapsedMillisecondsOfDay / (1000 * 60 * 60)) % 24)
+            .toString().padStart(
             2,
             "0",
-          )}:{(Math.floor(seconds / (1000 * 60)) % 60).toString().padStart(
+          )}:{(Math.floor(elapsedMillisecondsOfDay / (1000 * 60)) % 60)
+            .toString().padStart(
             2,
             "0",
-          )}:{(Math.floor(seconds / (1000)) % 60).toString().padStart(2, "0")}
+          )}:{(Math.floor(elapsedMillisecondsOfDay / (1000)) % 60).toString()
+            .padStart(2, "0")}
         </text>
         <time>
           {now.toZonedDateTimeISO(timezone).toString()}
