@@ -48,7 +48,6 @@ export const ClockSetting = (
           alignItems: "center",
         }}
       >
-        <div style={{ width: 80 }}>date</div>
         <input
           style={{ padding: 4, fontSize: 16 }}
           type="datetime-local"
@@ -72,7 +71,6 @@ export const ClockSetting = (
           alignItems: "center",
         }}
       >
-        <div style={{ width: 80 }}>message</div>
         <input
           style={{ padding: 4, fontSize: 16 }}
           type="text"

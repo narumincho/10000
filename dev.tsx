@@ -1,7 +1,7 @@
 import { createServer as createHttpServer } from "node:http";
 import { renderToString } from "react-dom/server";
 import { createServer as createViteServer } from "vite";
-import { Html } from "./html.tsx";
+import type * as html from "./html.tsx";
 
 const vite = await createViteServer({
   appType: "custom",
@@ -30,11 +30,12 @@ const server = createHttpServer((request, response) => {
       response.writeHead(200, {
         "Content-Type": "text/html; charset=utf-8",
       });
+      const htmlModule = (await vite.ssrLoadModule("/html.tsx")) as typeof html;
       response.end(
         await vite.transformIndexHtml(
           requestUrl,
           renderToString(
-            <Html
+            <htmlModule.Html
               initialDate={Temporal.Now.instant()}
               url={url}
               scriptPath="./client/client.tsx"
@@ -57,6 +58,9 @@ const server = createHttpServer((request, response) => {
   });
 });
 
-server.listen("127.0.0.1", () => {
-  console.log(server.address());
+const address = "[::1]";
+const port = 3000;
+
+server.listen(port, address, () => {
+  console.log(`Server is running at http://${address}:${port}`);
 });

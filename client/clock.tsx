@@ -59,7 +59,6 @@ export function Clock24WithTimezone(
     readonly onChangeUrl: (newURL: UrlParameter) => void;
   },
 ) {
-  const [isSettingMode, setIsSettingMode] = React.useState<boolean>(false);
   const [now, setNow] = React.useState<Temporal.Instant>(initialInstant);
 
   useAnimationFrame(() => {
@@ -77,16 +76,20 @@ export function Clock24WithTimezone(
 
   return (
     <div
-      style={{ backgroundColor: "#724242", height: "100%", display: "grid" }}
+      style={{
+        backgroundColor: "#724242",
+        height: "100%",
+        display: "grid",
+        gridAutoRows: "1fr auto",
+        alignItems: "center",
+      }}
     >
       <title>{clock24Title({ message, timezone, targetDate })}</title>
       <svg
         style={{
-          gridColumn: "1 / 2",
-          gridRow: "1 / 2",
+          display: "block",
           width: "100%",
           height: "100%",
-          display: "grid",
         }}
         viewBox="-100 -100 200 200"
       >
@@ -204,46 +207,14 @@ export function Clock24WithTimezone(
           {now.toZonedDateTimeISO(timezone).toString()}
         </time>
       </svg>
-      {isSettingMode &&
-        (
-          <div
-            style={{
-              gridColumn: "1 / 2",
-              gridRow: "1 / 2",
-              backdropFilter: "blur(8px)",
-            }}
-          >
-            <ClockSetting
-              message={message}
-              timezone={timezone}
-              targetDate={targetDate}
-              now={now}
-              onChangeUrl={onChangeUrl}
-            />
-          </div>
-        )}
-      <div
-        style={{
-          gridColumn: "1 / 2",
-          gridRow: "1 / 2",
-          justifySelf: "end",
-          zIndex: "1",
-        }}
-      >
-        <button
-          type="button"
-          style={{
-            padding: 16,
-            cursor: "pointer",
-            backgroundColor: "black",
-            fontSize: 24,
-          }}
-          onClick={() => {
-            setIsSettingMode((prev) => !prev);
-          }}
-        >
-          ⚙️
-        </button>
+      <div style={{ overflow: "auto", padding: "10px" }}>
+        <ClockSetting
+          message={message}
+          timezone={timezone}
+          targetDate={targetDate}
+          now={now}
+          onChangeUrl={onChangeUrl}
+        />
       </div>
     </div>
   );
