@@ -1,16 +1,15 @@
-import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ClockSetting } from "./clockSetting.tsx";
 import { UrlParameter } from "./url.ts";
 
 function useAnimationFrame(callback = () => {}) {
-  const reqIdRef = React.useRef<number>(undefined);
-  const loop = React.useCallback(() => {
+  const reqIdRef = useRef<number>(undefined);
+  const loop = () => {
     reqIdRef.current = requestAnimationFrame(loop);
     callback();
-  }, [callback]);
+  };
 
-  React.useEffect(() => {
+  useEffect(() => {
     reqIdRef.current = requestAnimationFrame(loop);
     return () => {
       if (reqIdRef.current !== undefined) {
@@ -59,7 +58,7 @@ export function Clock24WithTimezone(
     readonly onChangeUrl: (newURL: UrlParameter) => void;
   },
 ) {
-  const [now, setNow] = React.useState<Temporal.Instant>(initialInstant);
+  const [now, setNow] = useState<Temporal.Instant>(initialInstant);
 
   useAnimationFrame(() => {
     setNow(Temporal.Now.instant());
