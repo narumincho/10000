@@ -3,19 +3,29 @@ import { renderToString } from "react-dom/server";
 import { createServer as createViteServer } from "vite";
 import type * as html from "./html.tsx";
 
+const address = "::1";
+const browserAddress = "[::1]";
+const port = 3000;
+const server = createHttpServer();
+
 const vite = await createViteServer({
   appType: "custom",
   server: {
     middlewareMode: true,
+    hmr: {
+      server,
+      host: browserAddress,
+      clientPort: port,
+    },
   },
 });
 
-const server = createHttpServer((request, response) => {
+server.on("request", (request, response) => {
   vite.middlewares(request, response, async () => {
     const requestUrl = request.url ?? "/";
     const url = new URL(
       requestUrl,
-      `http://${request.headers.host ?? "127.0.0.1:5173"}`,
+      `http://${request.headers.host ?? `[${address}]:${port}`}`,
     );
 
     if (url.pathname !== "/") {
@@ -58,9 +68,6 @@ const server = createHttpServer((request, response) => {
   });
 });
 
-const address = "[::1]";
-const port = 3000;
-
 server.listen(port, address, () => {
-  console.log(`Server is running at http://${address}:${port}`);
+  console.log(`Server is running at http://${browserAddress}:${port}`);
 });

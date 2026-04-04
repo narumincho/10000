@@ -94,35 +94,40 @@ export function Clock24WithTimezone(
         viewBox="-100 -100 200 200"
       >
         <circle cx={0} cy={0} r={93} stroke="#ca8484" fill="#b56566" />
-        {Array.from({ length: 24 }).map((_, index) => {
-          const angle = index / 24 * Math.PI * 2 - Math.PI / 2;
-          return (
-            <text
-              text-anchor="middle"
-              alignment-baseline="middle"
-              x={Math.cos(angle) * 75}
-              y={Math.sin(angle) * 75}
-              fill="#000"
-              fontSize={12}
-            >
-              {index}
-            </text>
-          );
-        })}
-        {Array.from({ length: 60 }).map((_, index) => {
-          const angle = index / 60 * Math.PI * 2 - Math.PI / 2;
-          const isFive = index % 5 === 0;
-          return (
-            <line
-              x1={Math.cos(angle) * (isFive ? 85 : 87)}
-              y1={Math.sin(angle) * (isFive ? 85 : 87)}
-              x2={Math.cos(angle) * 93}
-              y2={Math.sin(angle) * 93}
-              strokeWidth={isFive ? 2 : 1}
-              stroke="#000"
-            />
-          );
-        })}
+        <g name="numbers">
+          {Array.from({ length: 24 }).map((_, index) => {
+            const angle = index / 24 * Math.PI * 2 - Math.PI / 2;
+            return (
+              <text
+                text-anchor="middle"
+                alignment-baseline="middle"
+                x={Math.cos(angle) * 75}
+                y={Math.sin(angle) * 75}
+                fill="#000"
+                fontSize={12}
+              >
+                {index}
+              </text>
+            );
+          })}
+        </g>
+        <g name="markings">
+          {Array.from({ length: 60 }).map((_, index) => {
+            const angle = index / 60 * Math.PI * 2 - Math.PI / 2;
+            const isFive = index % 5 === 0;
+            return (
+              <line
+                x1={Math.cos(angle) * (isFive ? 85 : 87)}
+                y1={Math.sin(angle) * (isFive ? 85 : 87)}
+                x2={Math.cos(angle) * 93}
+                y2={Math.sin(angle) * 93}
+                strokeWidth={isFive ? 2 : 1}
+                stroke="#000"
+              />
+            );
+          })}
+        </g>
+
         <Needle
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60)}
           color="#FA2222"
@@ -141,18 +146,13 @@ export function Clock24WithTimezone(
           length={50}
           width={3}
         />
-        <text
-          x={0}
-          y={-30}
-          textAnchor="middle"
-          alignmentBaseline="middle"
-          fill="#400488"
-          stroke="white"
-          strokeWidth={0.5}
-          fontSize={18}
-        >
-          {message}
-        </text>
+        <Message
+          key="message"
+          message={message}
+          onChange={(newMessage) => {
+            onChangeUrl({ message: newMessage, timezone, targetDate });
+          }}
+        />
         {limitValueAndUnit && (
           <text
             x={0}
@@ -203,9 +203,6 @@ export function Clock24WithTimezone(
             )}:{(Math.floor(elapsedMillisecondsOfDay / (1000)) % 60).toString()
             .padStart(2, "0")}
         </text>
-        <time>
-          {now.toZonedDateTimeISO(timezone).toString()}
-        </time>
       </svg>
       <div style={{ overflow: "auto", padding: "10px" }}>
         <ClockSetting
@@ -266,4 +263,36 @@ export function timeToDisplayText(
   }
   const diffSeconds = Math.floor(diffAbs / 1000);
   return { value: diffSeconds, unit: "秒", after };
+}
+
+function Message(
+  { message, onChange }: {
+    message: string;
+    onChange: (newMessage: string) => void;
+  },
+) {
+  return (
+    <foreignObject
+      x={-80}
+      y={-30}
+      width={160}
+      height={30}
+      textAnchor="middle"
+      alignmentBaseline="middle"
+      fill="#400488"
+      stroke="white"
+      strokeWidth={0.5}
+      fontSize={18}
+    >
+      <input
+        type="text"
+        name="message"
+        value={message}
+        style={{ background: "transparent", textAlign: "center" }}
+        onChange={(e) => {
+          onChange(e.target.value);
+        }}
+      />
+    </foreignObject>
+  );
 }

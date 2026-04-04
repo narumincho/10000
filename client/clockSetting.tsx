@@ -64,24 +64,6 @@ export const ClockSetting = (
         />
         <div>{getTimezoneOffsetText(timezone, now)}</div>
       </label>
-      <label
-        style={{
-          display: "flex",
-          gap: 8,
-          alignItems: "center",
-        }}
-      >
-        <input
-          style={{ padding: 4, fontSize: 16 }}
-          type="text"
-          value={message}
-          onChange={(e) => {
-            const newMessage = e.target.value;
-
-            onChangeUrl({ message: newMessage, timezone, targetDate });
-          }}
-        />
-      </label>
     </div>
   );
 };
