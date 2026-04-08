@@ -1,18 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  defaultHandDesigns,
-  DesignMode,
-  defaultTheme,
-  type HandDesigns,
   type ClockTheme,
+  defaultHandDesigns,
+  defaultTheme,
+  DesignMode,
+  type HandDesigns,
   type OddHourNumberDisplay,
 } from "./design_mode.tsx";
 import { UrlParameter } from "./url.ts";
-import {
-  Hour24Hand,
-  MinuteHand,
-  SecondHand,
-} from "./hand.tsx";
+import { Hour24Hand, MinuteHand, SecondHand } from "./hand.tsx";
 
 function useAnimationFrame(callback = () => {}) {
   const reqIdRef = useRef<number>(undefined);
@@ -76,8 +72,9 @@ export function Clock24WithTimezone(
   const [handDesigns, setHandDesigns] = useState<HandDesigns>(
     defaultHandDesigns,
   );
-  const [oddHourNumberDisplay, setOddHourNumberDisplay] =
-    useState<OddHourNumberDisplay>("same");
+  const [oddHourNumberDisplay, setOddHourNumberDisplay] = useState<
+    OddHourNumberDisplay
+  >("same");
 
   useAnimationFrame(() => {
     setNow(Temporal.Now.instant());
