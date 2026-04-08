@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { Clock24, clock24Title } from "./clock.tsx";
+import { renderClockIconSvgDataUrl } from "./icon_svg.tsx";
 import { encodeUrlParams, parseUrl } from "./url.ts";
 import type {} from "navigation-api-types";
 
@@ -21,13 +22,29 @@ function WithRouter() {
 
     setIconLink({
       type: "image/svg+xml",
-      href: `/icon.svg${encodeUrlParams(parameter)}`,
+      href: renderClockIconSvgDataUrl({
+        parameter,
+        now: Temporal.Instant.fromEpochMilliseconds(Date.now()),
+      }),
       sizes: "any",
     });
     setIconLink({
       type: "image/png",
       href: `/icon.png${encodeUrlParams(parameter)}`,
     });
+    const timer = setInterval(() => {
+      setIconLink({
+        type: "image/svg+xml",
+        href: renderClockIconSvgDataUrl({
+          parameter,
+          now: Temporal.Instant.fromEpochMilliseconds(Date.now()),
+        }),
+        sizes: "any",
+      });
+    }, 1000);
+    return () => {
+      clearInterval(timer);
+    };
   }, [parameter]);
 
   useEffect(() => {
