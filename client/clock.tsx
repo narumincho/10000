@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { UrlParameter } from "./url.ts";
+import { Hour24Hand, MinuteHand, SecondHand } from "./hand.tsx";
 
 type ClockTheme = {
   readonly background: string;
@@ -158,24 +159,20 @@ export function Clock24WithTimezone(
           })}
         </g>
 
-        <Needle
+        <Hour24Hand
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60 * 24)}
           color={theme.hourHand}
-          length={50}
-          width={3}
         />
-        <Needle
+        <MinuteHand
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60)}
           color={theme.minuteHand}
-          length={70}
-          width={2}
         />
-        <Needle
+        <SecondHand
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60)}
           color={theme.secondHand}
-          length={90}
-          width={1}
         />
+        <circle cx={0} cy={0} r={4.5} fill={theme.infoOutline} />
+        <circle cx={0} cy={0} r={2.2} fill={theme.markers} />
 
         <Message
           message={message}
@@ -336,24 +333,6 @@ export function Clock24WithTimezone(
         </svg>
       </button>
     </div>
-  );
-}
-
-export function Needle(
-  props: {
-    readonly angle0To1: number;
-    readonly color: string;
-    readonly length: number;
-    readonly width: number;
-  },
-) {
-  return (
-    <g transform={`rotate(${(props.angle0To1 * 360 + 270) % 360})`}>
-      <polygon
-        points={`-5 0 0 -${props.width} ${props.length} 0 0 ${props.width} -5 0`}
-        fill={props.color}
-      />
-    </g>
   );
 }
 
