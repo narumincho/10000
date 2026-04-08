@@ -16,6 +16,12 @@ export function Html(
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
           rel="icon"
+          type="image/svg+xml"
+          sizes="any"
+          href={`/icon.svg${encodeUrlParams(parameter)}`}
+        />
+        <link
+          rel="icon"
           type="image/png"
           href={`/icon.png${encodeUrlParams(parameter)}`}
         />

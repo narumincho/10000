@@ -17,6 +17,20 @@ function WithRouter() {
   );
 
   useEffect(() => {
+    document.title = clock24Title(parameter);
+
+    setIconLink({
+      type: "image/svg+xml",
+      href: `/icon.svg${encodeUrlParams(parameter)}`,
+      sizes: "any",
+    });
+    setIconLink({
+      type: "image/png",
+      href: `/icon.png${encodeUrlParams(parameter)}`,
+    });
+  }, [parameter]);
+
+  useEffect(() => {
     const handler = (event: NavigateEvent) => {
       if (!event.canIntercept) {
         return;
@@ -63,4 +77,26 @@ function WithRouter() {
       }}
     />
   );
+}
+
+function setIconLink(
+  { type, href, sizes }: {
+    readonly type: string;
+    readonly href: string;
+    readonly sizes?: string;
+  },
+) {
+  let iconLink = document.head.querySelector<HTMLLinkElement>(
+    `link[rel="icon"][type="${type}"]`,
+  );
+  if (!iconLink) {
+    iconLink = document.createElement("link");
+    iconLink.rel = "icon";
+    iconLink.type = type;
+    document.head.append(iconLink);
+  }
+  if (sizes) {
+    iconLink.sizes.value = sizes;
+  }
+  iconLink.href = href;
 }
