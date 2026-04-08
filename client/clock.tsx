@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { UrlParameter } from "./url.ts";
-import { Hour24Hand, MinuteHand, SecondHand } from "./hand.tsx";
+import {
+  Hour24Hand,
+  hour24HandDesignOptions,
+  type Hour24HandDesign,
+  MinuteHand,
+  minuteHandDesignOptions,
+  type MinuteHandDesign,
+  SecondHand,
+  secondHandDesignOptions,
+  type SecondHandDesign,
+} from "./hand.tsx";
 
 type ClockTheme = {
   readonly background: string;
@@ -24,6 +34,18 @@ const defaultTheme: ClockTheme = {
   secondHand: "#FA2222",
   infoText: "#400488",
   infoOutline: "#ffffff",
+};
+
+type HandDesigns = {
+  readonly hour24: Hour24HandDesign;
+  readonly minute: MinuteHandDesign;
+  readonly second: SecondHandDesign;
+};
+
+const defaultHandDesigns: HandDesigns = {
+  hour24: "leaf",
+  minute: "dauphine",
+  second: "needle",
 };
 
 function useAnimationFrame(callback = () => {}) {
@@ -85,6 +107,9 @@ export function Clock24WithTimezone(
   const [now, setNow] = useState<Temporal.Instant>(initialInstant);
   const [isDesignMode, setIsDesignMode] = useState(false);
   const [theme, setTheme] = useState<ClockTheme>(defaultTheme);
+  const [handDesigns, setHandDesigns] = useState<HandDesigns>(
+    defaultHandDesigns,
+  );
 
   useAnimationFrame(() => {
     setNow(Temporal.Now.instant());
@@ -162,14 +187,17 @@ export function Clock24WithTimezone(
         <Hour24Hand
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60 * 24)}
           color={theme.hourHand}
+          design={handDesigns.hour24}
         />
         <MinuteHand
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60)}
           color={theme.minuteHand}
+          design={handDesigns.minute}
         />
         <SecondHand
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60)}
           color={theme.secondHand}
+          design={handDesigns.second}
         />
         <circle cx={0} cy={0} r={4.5} fill={theme.infoOutline} />
         <circle cx={0} cy={0} r={2.2} fill={theme.markers} />
@@ -269,6 +297,14 @@ export function Clock24WithTimezone(
               value={theme.hourHand}
               onChange={(hourHand) => setTheme({ ...theme, hourHand })}
             />
+            <SelectEditor
+              x={-70}
+              y={52}
+              label="24h針"
+              value={handDesigns.hour24}
+              options={hour24HandDesignOptions}
+              onChange={(hour24) => setHandDesigns({ ...handDesigns, hour24 })}
+            />
             <ColorEditor
               x={0}
               y={-84}
@@ -276,12 +312,28 @@ export function Clock24WithTimezone(
               value={theme.minuteHand}
               onChange={(minuteHand) => setTheme({ ...theme, minuteHand })}
             />
+            <SelectEditor
+              x={-26}
+              y={-96}
+              label="分針"
+              value={handDesigns.minute}
+              options={minuteHandDesignOptions}
+              onChange={(minute) => setHandDesigns({ ...handDesigns, minute })}
+            />
             <ColorEditor
               x={70}
               y={-12}
               label="秒針"
               value={theme.secondHand}
               onChange={(secondHand) => setTheme({ ...theme, secondHand })}
+            />
+            <SelectEditor
+              x={68}
+              y={0}
+              label="秒針"
+              value={handDesigns.second}
+              options={secondHandDesignOptions}
+              onChange={(second) => setHandDesigns({ ...handDesigns, second })}
             />
             <ColorEditor
               x={44}
@@ -460,6 +512,46 @@ function ColorEditor(
           }}
         />
       </label>
+    </foreignObject>
+  );
+}
+
+function SelectEditor<T extends string>(
+  { x, y, label, value, options, onChange }: {
+    readonly x: number;
+    readonly y: number;
+    readonly label: string;
+    readonly value: T;
+    readonly options: readonly T[];
+    readonly onChange: (value: T) => void;
+  },
+) {
+  return (
+    <foreignObject x={x} y={y} width={54} height={18}>
+      <select
+        aria-label={label}
+        value={value}
+        style={{
+          width: "100%",
+          height: "100%",
+          borderRadius: 999,
+          border: "1px solid rgba(255, 255, 255, 0.35)",
+          background: "rgba(20, 16, 16, 0.85)",
+          color: "#ffffff",
+          fontSize: 8,
+          padding: "0 6px",
+          outline: "none",
+        }}
+        onChange={(event) => {
+          onChange(event.target.value as T);
+        }}
+      >
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
     </foreignObject>
   );
 }
