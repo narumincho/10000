@@ -1,6 +1,9 @@
 import { renderToReadableStream } from "react-dom/server";
 import { ImageResponse } from "@vercel/og";
 import { Html } from "./html.tsx";
+import { ClockIconPng } from "./client/icon_png.tsx";
+import { renderClockIconSvg } from "./client/icon_svg.tsx";
+import { parseUrl } from "./client/url.ts";
 
 const scriptName = (await Array.fromAsync(Deno.readDir("./dist/assets")))[0];
 
@@ -53,6 +56,35 @@ export default {
           {
             width: 1200,
             height: 630,
+          },
+        );
+      case "/icon.png":
+        return new ImageResponse(
+          (
+            <ClockIconPng
+              parameter={parseUrl(url)}
+              now={Temporal.Now.instant()}
+            />
+          ),
+          {
+            width: 256,
+            height: 256,
+            headers: {
+              "Cache-Control": "no-store, max-age=0",
+            },
+          },
+        );
+      case "/icon.svg":
+        return new Response(
+          renderClockIconSvg({
+            parameter: parseUrl(url),
+            now: Temporal.Now.instant(),
+          }),
+          {
+            headers: {
+              "Content-Type": "image/svg+xml; charset=utf-8",
+              "Cache-Control": "no-store, max-age=0",
+            },
           },
         );
     }

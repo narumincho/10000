@@ -1,7 +1,23 @@
+import {
+  type ClockTheme,
+  defaultHandDesigns,
+  defaultTheme,
+  type HandDesigns,
+  type OddHourNumberDisplay,
+} from "./design_mode.tsx";
+import {
+  hour24HandDesignOptions,
+  minuteHandDesignOptions,
+  secondHandDesignOptions,
+} from "./hand.tsx";
+
 export type UrlParameter = {
   readonly message: string;
   readonly timezone: string | undefined;
   readonly targetDate: Temporal.Instant | undefined;
+  readonly theme: ClockTheme;
+  readonly handDesigns: HandDesigns;
+  readonly oddHourNumberDisplay: OddHourNumberDisplay;
 };
 
 export function parseUrl(url: URL): UrlParameter {
@@ -10,6 +26,42 @@ export function parseUrl(url: URL): UrlParameter {
     timezone: url.searchParams.get("timezone") ?? undefined,
     targetDate: tryParseTemporalInstant(url.searchParams.get("date")) ??
       undefined,
+    theme: {
+      background: url.searchParams.get("bg") ?? defaultTheme.background,
+      dialStroke: url.searchParams.get("dialStroke") ?? defaultTheme.dialStroke,
+      dialFill: url.searchParams.get("dialFill") ?? defaultTheme.dialFill,
+      markers: url.searchParams.get("markers") ?? defaultTheme.markers,
+      hourHand: url.searchParams.get("hourHandColor") ?? defaultTheme.hourHand,
+      minuteHand: url.searchParams.get("minuteHandColor") ??
+        defaultTheme.minuteHand,
+      secondHand: url.searchParams.get("secondHandColor") ??
+        defaultTheme.secondHand,
+      infoText: url.searchParams.get("infoText") ?? defaultTheme.infoText,
+      infoOutline: url.searchParams.get("infoOutline") ??
+        defaultTheme.infoOutline,
+    },
+    handDesigns: {
+      hour24: parseEnum(
+        url.searchParams.get("hourHandDesign"),
+        hour24HandDesignOptions,
+        defaultHandDesigns.hour24,
+      ),
+      minute: parseEnum(
+        url.searchParams.get("minuteHandDesign"),
+        minuteHandDesignOptions,
+        defaultHandDesigns.minute,
+      ),
+      second: parseEnum(
+        url.searchParams.get("secondHandDesign"),
+        secondHandDesignOptions,
+        defaultHandDesigns.second,
+      ),
+    },
+    oddHourNumberDisplay: parseEnum(
+      url.searchParams.get("oddHourNumber"),
+      ["same", "small", "hidden"] as const,
+      "same",
+    ),
   };
 }
 
@@ -26,12 +78,37 @@ function tryParseTemporalInstant(
   }
 }
 
-export function encodeUrl(
-  { message, timezone, targetDate }: UrlParameter,
+export function encodeUrlParams(
+  { message, timezone, targetDate, theme, handDesigns, oddHourNumberDisplay }:
+    UrlParameter,
 ): string {
   return `?${new URLSearchParams({
     ...(message ? { message } : {}),
     ...(timezone ? { timezone } : {}),
     ...(targetDate ? { date: targetDate.toString() } : {}),
+    bg: theme.background,
+    dialStroke: theme.dialStroke,
+    dialFill: theme.dialFill,
+    markers: theme.markers,
+    hourHandColor: theme.hourHand,
+    minuteHandColor: theme.minuteHand,
+    secondHandColor: theme.secondHand,
+    infoText: theme.infoText,
+    infoOutline: theme.infoOutline,
+    hourHandDesign: handDesigns.hour24,
+    minuteHandDesign: handDesigns.minute,
+    secondHandDesign: handDesigns.second,
+    oddHourNumber: oddHourNumberDisplay,
   })}`;
+}
+
+function parseEnum<T extends string>(
+  value: string | null,
+  options: readonly T[],
+  fallback: T,
+): T {
+  if (value && options.includes(value as T)) {
+    return value as T;
+  }
+  return fallback;
 }

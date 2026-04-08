@@ -1,5 +1,5 @@
 import { Clock24 } from "./client/clock.tsx";
-import { parseUrl } from "./client/url.ts";
+import { encodeUrlParams, parseUrl } from "./client/url.ts";
 
 export function Html(
   { initialDate, url, scriptPath }: {
@@ -8,11 +8,23 @@ export function Html(
     scriptPath: string;
   },
 ) {
+  const parameter = parseUrl(url);
   return (
     <html style={{ height: "100%" }}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link
+          rel="icon"
+          type="image/svg+xml"
+          sizes="any"
+          href={`/icon.svg${encodeUrlParams(parameter)}`}
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          href={`/icon.png${encodeUrlParams(parameter)}`}
+        />
         <script type="module" src={scriptPath} />
       </head>
       <body style={{ height: "100%", margin: 0 }}>
@@ -22,7 +34,7 @@ export function Html(
           style={{ height: "100%" }}
         >
           <Clock24
-            parameter={parseUrl(url)}
+            parameter={parameter}
             initialInstant={initialDate}
             onChangeUrl={() => {}}
           />
