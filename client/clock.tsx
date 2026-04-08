@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  type ClockTheme,
-  defaultHandDesigns,
-  defaultTheme,
-  DesignMode,
-  type HandDesigns,
-  type OddHourNumberDisplay,
-} from "./design_mode.tsx";
+import { DesignMode } from "./design_mode.tsx";
 import { UrlParameter } from "./url.ts";
 import { Hour24Hand, MinuteHand, SecondHand } from "./hand.tsx";
+
+type UrlParameterWithTimezone = UrlParameter & {
+  readonly timezone: string;
+};
 
 function useAnimationFrame(callback = () => {}) {
   const reqIdRef = useRef<number>(undefined);
@@ -46,11 +43,13 @@ export function Clock24(
   if (!parameter.timezone) {
     return <div>loading timezone...</div>;
   }
+  const parameterWithTimezone: UrlParameterWithTimezone = {
+    ...parameter,
+    timezone: parameter.timezone,
+  };
   return (
     <Clock24WithTimezone
-      message={parameter.message}
-      timezone={parameter.timezone}
-      targetDate={parameter.targetDate}
+      parameter={parameterWithTimezone}
       initialInstant={initialInstant}
       onChangeUrl={onChangeUrl}
     />
@@ -58,28 +57,22 @@ export function Clock24(
 }
 
 export function Clock24WithTimezone(
-  { message, timezone, targetDate, initialInstant, onChangeUrl }: {
-    readonly message: string;
-    readonly timezone: string;
-    readonly targetDate: Temporal.Instant | undefined;
+  { parameter, initialInstant, onChangeUrl }: {
+    readonly parameter: UrlParameterWithTimezone;
     readonly initialInstant: Temporal.Instant;
-    readonly onChangeUrl: (newURL: UrlParameter) => void;
+    readonly onChangeUrl: (newURL: UrlParameterWithTimezone) => void;
   },
 ) {
   const [now, setNow] = useState<Temporal.Instant>(initialInstant);
   const [isDesignMode, setIsDesignMode] = useState(false);
-  const [theme, setTheme] = useState<ClockTheme>(defaultTheme);
-  const [handDesigns, setHandDesigns] = useState<HandDesigns>(
-    defaultHandDesigns,
-  );
-  const [oddHourNumberDisplay, setOddHourNumberDisplay] = useState<
-    OddHourNumberDisplay
-  >("same");
 
   useAnimationFrame(() => {
     setNow(Temporal.Now.instant());
   });
 
+  const { message, targetDate, theme, handDesigns, oddHourNumberDisplay } =
+    parameter;
+  const { timezone } = parameter;
   const zonedNow = now.toZonedDateTimeISO(timezone);
   const elapsedMillisecondsOfDay =
     (((zonedNow.hour * 60) + zonedNow.minute) * 60 + zonedNow.second) * 1000 +
@@ -97,7 +90,7 @@ export function Clock24WithTimezone(
         position: "relative",
       }}
     >
-      <title>{clock24Title({ message, timezone, targetDate })}</title>
+      <title>{clock24Title(parameter)}</title>
       <svg
         style={{
           display: "block",
@@ -176,7 +169,7 @@ export function Clock24WithTimezone(
           textColor={theme.infoText}
           outlineColor={theme.infoOutline}
           onChange={(newMessage) => {
-            onChangeUrl({ message: newMessage, timezone, targetDate });
+            onChangeUrl({ ...parameter, message: newMessage });
           }}
         />
         {limitValueAndUnit && (
@@ -234,9 +227,11 @@ export function Clock24WithTimezone(
             theme={theme}
             handDesigns={handDesigns}
             oddHourNumberDisplay={oddHourNumberDisplay}
-            onThemeChange={setTheme}
-            onHandDesignsChange={setHandDesigns}
-            onOddHourNumberDisplayChange={setOddHourNumberDisplay}
+            onThemeChange={(theme) => onChangeUrl({ ...parameter, theme })}
+            onHandDesignsChange={(handDesigns) =>
+              onChangeUrl({ ...parameter, handDesigns })}
+            onOddHourNumberDisplayChange={(oddHourNumberDisplay) =>
+              onChangeUrl({ ...parameter, oddHourNumberDisplay })}
           />
         )}
       </svg>
