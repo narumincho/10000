@@ -1,29 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  type ClockTheme,
+  defaultHandDesigns,
+  defaultTheme,
+  DesignMode,
+  type HandDesigns,
+  type OddHourNumberDisplay,
+} from "./design_mode.tsx";
 import { UrlParameter } from "./url.ts";
-
-type ClockTheme = {
-  readonly background: string;
-  readonly dialStroke: string;
-  readonly dialFill: string;
-  readonly markers: string;
-  readonly hourHand: string;
-  readonly minuteHand: string;
-  readonly secondHand: string;
-  readonly infoText: string;
-  readonly infoOutline: string;
-};
-
-const defaultTheme: ClockTheme = {
-  background: "#724242",
-  dialStroke: "#ca8484",
-  dialFill: "#b56566",
-  markers: "#000000",
-  hourHand: "#60554A",
-  minuteHand: "#FAE080",
-  secondHand: "#FA2222",
-  infoText: "#400488",
-  infoOutline: "#ffffff",
-};
+import { Hour24Hand, MinuteHand, SecondHand } from "./hand.tsx";
 
 function useAnimationFrame(callback = () => {}) {
   const reqIdRef = useRef<number>(undefined);
@@ -84,6 +69,12 @@ export function Clock24WithTimezone(
   const [now, setNow] = useState<Temporal.Instant>(initialInstant);
   const [isDesignMode, setIsDesignMode] = useState(false);
   const [theme, setTheme] = useState<ClockTheme>(defaultTheme);
+  const [handDesigns, setHandDesigns] = useState<HandDesigns>(
+    defaultHandDesigns,
+  );
+  const [oddHourNumberDisplay, setOddHourNumberDisplay] = useState<
+    OddHourNumberDisplay
+  >("same");
 
   useAnimationFrame(() => {
     setNow(Temporal.Now.instant());
@@ -125,6 +116,10 @@ export function Clock24WithTimezone(
         <g name="numbers">
           {Array.from({ length: 24 }).map((_, index) => {
             const angle = index / 24 * Math.PI * 2 - Math.PI / 2;
+            const isOdd = index % 2 === 1;
+            if (isOdd && oddHourNumberDisplay === "hidden") {
+              return null;
+            }
             return (
               <text
                 key={index}
@@ -133,7 +128,7 @@ export function Clock24WithTimezone(
                 x={Math.cos(angle) * 75}
                 y={Math.sin(angle) * 75}
                 fill={theme.markers}
-                fontSize={12}
+                fontSize={isOdd && oddHourNumberDisplay === "small" ? 8 : 12}
               >
                 {index}
               </text>
@@ -158,24 +153,23 @@ export function Clock24WithTimezone(
           })}
         </g>
 
-        <Needle
+        <Hour24Hand
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60 * 24)}
           color={theme.hourHand}
-          length={50}
-          width={3}
+          design={handDesigns.hour24}
         />
-        <Needle
+        <MinuteHand
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60 * 60)}
           color={theme.minuteHand}
-          length={70}
-          width={2}
+          design={handDesigns.minute}
         />
-        <Needle
+        <SecondHand
           angle0To1={elapsedMillisecondsOfDay / (1000 * 60)}
           color={theme.secondHand}
-          length={90}
-          width={1}
+          design={handDesigns.second}
         />
+        <circle cx={0} cy={0} r={4.5} fill={theme.infoOutline} />
+        <circle cx={0} cy={0} r={2.2} fill={theme.markers} />
 
         <Message
           message={message}
@@ -236,71 +230,14 @@ export function Clock24WithTimezone(
             .padStart(2, "0")}
         </text>
         {isDesignMode && (
-          <>
-            <ColorEditor
-              x={-96}
-              y={72}
-              label="背景"
-              value={theme.background}
-              onChange={(background) => setTheme({ ...theme, background })}
-            />
-            <ColorEditor
-              x={-96}
-              y={-96}
-              label="外枠"
-              value={theme.dialStroke}
-              onChange={(dialStroke) => setTheme({ ...theme, dialStroke })}
-            />
-            <ColorEditor
-              x={54}
-              y={-96}
-              label="文字盤"
-              value={theme.dialFill}
-              onChange={(dialFill) => setTheme({ ...theme, dialFill })}
-            />
-            <ColorEditor
-              x={-96}
-              y={-16}
-              label="目盛"
-              value={theme.markers}
-              onChange={(markers) => setTheme({ ...theme, markers })}
-            />
-            <ColorEditor
-              x={-44}
-              y={44}
-              label="24h針"
-              value={theme.hourHand}
-              onChange={(hourHand) => setTheme({ ...theme, hourHand })}
-            />
-            <ColorEditor
-              x={0}
-              y={-84}
-              label="分針"
-              value={theme.minuteHand}
-              onChange={(minuteHand) => setTheme({ ...theme, minuteHand })}
-            />
-            <ColorEditor
-              x={70}
-              y={-12}
-              label="秒針"
-              value={theme.secondHand}
-              onChange={(secondHand) => setTheme({ ...theme, secondHand })}
-            />
-            <ColorEditor
-              x={44}
-              y={44}
-              label="文字"
-              value={theme.infoText}
-              onChange={(infoText) => setTheme({ ...theme, infoText })}
-            />
-            <ColorEditor
-              x={-8}
-              y={72}
-              label="縁取り"
-              value={theme.infoOutline}
-              onChange={(infoOutline) => setTheme({ ...theme, infoOutline })}
-            />
-          </>
+          <DesignMode
+            theme={theme}
+            handDesigns={handDesigns}
+            oddHourNumberDisplay={oddHourNumberDisplay}
+            onThemeChange={setTheme}
+            onHandDesignsChange={setHandDesigns}
+            onOddHourNumberDisplayChange={setOddHourNumberDisplay}
+          />
         )}
       </svg>
       <button
@@ -336,24 +273,6 @@ export function Clock24WithTimezone(
         </svg>
       </button>
     </div>
-  );
-}
-
-export function Needle(
-  props: {
-    readonly angle0To1: number;
-    readonly color: string;
-    readonly length: number;
-    readonly width: number;
-  },
-) {
-  return (
-    <g transform={`rotate(${(props.angle0To1 * 360 + 270) % 360})`}>
-      <polygon
-        points={`-5 0 0 -${props.width} ${props.length} 0 0 ${props.width} -5 0`}
-        fill={props.color}
-      />
-    </g>
   );
 }
 
@@ -426,61 +345,6 @@ function Message(
           onChange(e.target.value);
         }}
       />
-    </foreignObject>
-  );
-}
-
-function ColorEditor(
-  { x, y, label, value, onChange }: {
-    readonly x: number;
-    readonly y: number;
-    readonly label?: string;
-    readonly value: string;
-    readonly onChange: (value: string) => void;
-  },
-) {
-  return (
-    <foreignObject x={x} y={y} width={42} height={42}>
-      <label
-        style={{
-          position: "relative",
-          display: "block",
-          width: 28,
-          height: 28,
-        }}
-        title={label}
-      >
-        <span
-          style={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: "50%",
-            backgroundColor: value,
-            border: "2px solid rgba(255, 255, 255, 0.45)",
-            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.35)",
-            pointerEvents: "none",
-          }}
-        />
-        <input
-          type="color"
-          aria-label={label}
-          value={value}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            padding: 0,
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-            opacity: 0,
-          }}
-          onChange={(event) => {
-            onChange(event.target.value);
-          }}
-        />
-      </label>
     </foreignObject>
   );
 }
