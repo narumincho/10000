@@ -305,7 +305,9 @@ export function Clock24WithTimezone(
       </svg>
       <button
         type="button"
-        aria-label={isDesignMode ? "デザイン編集モードを閉じる" : "デザイン編集モードを開く"}
+        aria-label={isDesignMode
+          ? "デザイン編集モードを閉じる"
+          : "デザイン編集モードを開く"}
         onClick={() => {
           setIsDesignMode((value) => !value);
         }}
@@ -432,7 +434,7 @@ function ColorEditor(
   { x, y, label, value, onChange }: {
     readonly x: number;
     readonly y: number;
-    readonly label: string;
+    readonly label?: string;
     readonly value: string;
     readonly onChange: (value: string) => void;
   },
@@ -441,27 +443,38 @@ function ColorEditor(
     <foreignObject x={x} y={y} width={42} height={42}>
       <label
         style={{
-          display: "grid",
-          justifyItems: "center",
-          gap: 2,
-          fontSize: 8,
-          color: "#ffffff",
-          textShadow: "0 1px 2px rgba(0, 0, 0, 0.7)",
+          position: "relative",
+          display: "block",
+          width: 28,
+          height: 28,
         }}
         title={label}
       >
-        <span>{label}</span>
+        <span
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "50%",
+            backgroundColor: value,
+            border: "2px solid rgba(255, 255, 255, 0.45)",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.35)",
+            pointerEvents: "none",
+          }}
+        />
         <input
           type="color"
           aria-label={label}
           value={value}
           style={{
-            width: 24,
-            height: 24,
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
             padding: 0,
             border: "none",
             background: "transparent",
             cursor: "pointer",
+            opacity: 0,
           }}
           onChange={(event) => {
             onChange(event.target.value);
