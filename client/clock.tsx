@@ -5,6 +5,7 @@ import {
   defaultTheme,
   type HandDesigns,
   type ClockTheme,
+  type OddHourNumberDisplay,
 } from "./design_mode.tsx";
 import { UrlParameter } from "./url.ts";
 import {
@@ -75,6 +76,8 @@ export function Clock24WithTimezone(
   const [handDesigns, setHandDesigns] = useState<HandDesigns>(
     defaultHandDesigns,
   );
+  const [oddHourNumberDisplay, setOddHourNumberDisplay] =
+    useState<OddHourNumberDisplay>("same");
 
   useAnimationFrame(() => {
     setNow(Temporal.Now.instant());
@@ -116,6 +119,10 @@ export function Clock24WithTimezone(
         <g name="numbers">
           {Array.from({ length: 24 }).map((_, index) => {
             const angle = index / 24 * Math.PI * 2 - Math.PI / 2;
+            const isOdd = index % 2 === 1;
+            if (isOdd && oddHourNumberDisplay === "hidden") {
+              return null;
+            }
             return (
               <text
                 key={index}
@@ -124,7 +131,7 @@ export function Clock24WithTimezone(
                 x={Math.cos(angle) * 75}
                 y={Math.sin(angle) * 75}
                 fill={theme.markers}
-                fontSize={12}
+                fontSize={isOdd && oddHourNumberDisplay === "small" ? 8 : 12}
               >
                 {index}
               </text>
@@ -229,8 +236,10 @@ export function Clock24WithTimezone(
           <DesignMode
             theme={theme}
             handDesigns={handDesigns}
+            oddHourNumberDisplay={oddHourNumberDisplay}
             onThemeChange={setTheme}
             onHandDesignsChange={setHandDesigns}
+            onOddHourNumberDisplayChange={setOddHourNumberDisplay}
           />
         )}
       </svg>

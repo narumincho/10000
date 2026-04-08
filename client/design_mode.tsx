@@ -43,12 +43,31 @@ export const defaultHandDesigns: HandDesigns = {
   second: "needle",
 };
 
+export type OddHourNumberDisplay = "same" | "small" | "hidden";
+
+export const oddHourNumberDisplayOptions: readonly OddHourNumberDisplay[] = [
+  "same",
+  "small",
+  "hidden",
+];
+
 export function DesignMode(
-  { theme, handDesigns, onThemeChange, onHandDesignsChange }: {
+  {
+    theme,
+    handDesigns,
+    oddHourNumberDisplay,
+    onThemeChange,
+    onHandDesignsChange,
+    onOddHourNumberDisplayChange,
+  }: {
     readonly theme: ClockTheme;
     readonly handDesigns: HandDesigns;
+    readonly oddHourNumberDisplay: OddHourNumberDisplay;
     readonly onThemeChange: (theme: ClockTheme) => void;
     readonly onHandDesignsChange: (handDesigns: HandDesigns) => void;
+    readonly onOddHourNumberDisplayChange: (
+      oddHourNumberDisplay: OddHourNumberDisplay,
+    ) => void;
   },
 ) {
   return (
@@ -80,6 +99,14 @@ export function DesignMode(
         label="目盛"
         value={theme.markers}
         onChange={(markers) => onThemeChange({ ...theme, markers })}
+      />
+      <SelectEditor
+        x={-96}
+        y={18}
+        label="奇数数字"
+        value={oddHourNumberDisplay}
+        options={oddHourNumberDisplayOptions}
+        onChange={onOddHourNumberDisplayChange}
       />
       <ColorEditor
         x={-44}
