@@ -75,13 +75,30 @@ server.on("request", (request, response) => {
             },
           },
         );
-        const headers: Record<string, string> = {};
-        iconResponse.headers.forEach((value, key) => {
-          headers[key] = value;
-        });
 
-        response.writeHead(iconResponse.status, headers);
-        response.end(new Uint8Array(await iconResponse.arrayBuffer()));
+        response.writeHead(
+          iconResponse.status,
+          Object.fromEntries(iconResponse.headers),
+        );
+        if (!iconResponse.body) {
+          response.end();
+          return;
+        }
+        await iconResponse.body.pipeTo(
+          new WritableStream<Uint8Array>({
+            write(chunk) {
+              response.write(chunk);
+            },
+            close() {
+              response.end();
+            },
+            abort(error) {
+              response.destroy(
+                error instanceof Error ? error : new Error(String(error)),
+              );
+            },
+          }),
+        );
         return;
       }
 
