@@ -1,14 +1,14 @@
 import {
+  type ClockTheme,
   defaultHandDesigns,
   defaultTheme,
-  type ClockTheme,
   type HandDesigns,
   type OddHourNumberDisplay,
 } from "./design_mode.tsx";
 import {
-  secondHandDesignOptions,
-  minuteHandDesignOptions,
   hour24HandDesignOptions,
+  minuteHandDesignOptions,
+  secondHandDesignOptions,
 } from "./hand.tsx";
 
 export type UrlParameter = {
@@ -78,7 +78,7 @@ function tryParseTemporalInstant(
   }
 }
 
-export function encodeUrl(
+export function encodeUrlParams(
   { message, timezone, targetDate, theme, handDesigns, oddHourNumberDisplay }:
     UrlParameter,
 ): string {

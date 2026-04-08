@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
-import { Clock24 } from "./clock.tsx";
-import { encodeUrl, parseUrl } from "./url.ts";
+import { Clock24, clock24Title } from "./clock.tsx";
+import { encodeUrlParams, parseUrl } from "./url.ts";
 import type {} from "navigation-api-types";
 
 const appElement = document.getElementById("app");
@@ -57,7 +57,7 @@ function WithRouter() {
       })()}
       onChangeUrl={(parameter) => {
         console.log("onChangeUrl", parameter);
-        navigation?.navigate(encodeUrl(parameter), {
+        navigation?.navigate(encodeUrlParams(parameter), {
           history: "replace",
         });
       }}
