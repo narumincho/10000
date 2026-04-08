@@ -1,10 +1,10 @@
 import {
-  hour24HandDesignOptions,
   type Hour24HandDesign,
-  minuteHandDesignOptions,
+  hour24HandDesignOptions,
   type MinuteHandDesign,
-  secondHandDesignOptions,
+  minuteHandDesignOptions,
   type SecondHandDesign,
+  secondHandDesignOptions,
 } from "./hand.tsx";
 
 export type ClockTheme = {
