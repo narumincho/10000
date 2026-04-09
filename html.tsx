@@ -31,6 +31,10 @@ export function Html(
         /> */
         }
         <meta
+          name="description"
+          content={`${parameter.message} (${parameter.baseDate}) から ${parameter.plusDays} 日後まで...`}
+        />
+        <meta
           property="og:image"
           content={`/og-image${
             encodeUrlParams({ ...parameter, now: initialDate })
