@@ -6,7 +6,6 @@ import {
   addDaysToDateText,
   dateTextToInstant,
   TimeDifferencePanel,
-  TimeDifferenceText,
 } from "./diff.tsx";
 
 type UrlParameterWithTimezone = UrlParameter & {
@@ -93,7 +92,6 @@ export function Clock24WithTimezone(
   const baseDateText = baseDate ?? zonedNow.toPlainDate().toString();
   const targetDateText = addDaysToDateText(baseDateText, plusDays);
   const targetDate = dateTextToInstant(targetDateText, timezone);
-  const timeDifference = timeToDisplayText({ targetDate, now });
 
   return (
     <div
@@ -111,7 +109,8 @@ export function Clock24WithTimezone(
             baseDateText={baseDateText}
             plusDays={plusDays}
             targetDateText={targetDateText}
-            timeDifference={timeDifference}
+            now={now}
+            targetDate={targetDate}
             theme={theme}
             onMessageChange={(newMessage) => {
               onChangeUrl({ ...parameter, message: newMessage });
@@ -405,20 +404,6 @@ function TimeDifferenceIcon({ active }: { readonly active: boolean }) {
 
 export function clock24Title(parameter: UrlParameter) {
   return `${parameter.message ? `${parameter.message} | ` : ""}1周24時間の時計`;
-}
-
-export function timeToDisplayText(
-  { targetDate, now }: { targetDate: Temporal.Instant; now: Temporal.Instant },
-): TimeDifferenceText {
-  const diff = targetDate.epochMilliseconds - now.epochMilliseconds;
-  const after = diff < 0;
-  const diffAbs = Math.abs(diff);
-  const totalSeconds = Math.floor(diffAbs / 1000);
-  const days = Math.floor(totalSeconds / (60 * 60 * 24));
-  const hours = Math.floor(totalSeconds / (60 * 60)) % 24;
-  const minutes = Math.floor(totalSeconds / 60) % 60;
-  const seconds = totalSeconds % 60;
-  return { days, hours, minutes, seconds, after };
 }
 
 function Message(

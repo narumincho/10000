@@ -1,6 +1,6 @@
 import { UrlParameter } from "./url.ts";
 
-export type TimeDifferenceText = {
+type TimeDifferenceText = {
   readonly days: number;
   readonly hours: number;
   readonly minutes: number;
@@ -14,7 +14,8 @@ export function TimeDifferencePanel(
     baseDateText,
     plusDays,
     targetDateText,
-    timeDifference,
+    now,
+    targetDate,
     theme,
     onMessageChange,
     onBaseDateChange,
@@ -24,13 +25,26 @@ export function TimeDifferencePanel(
     readonly baseDateText: string;
     readonly plusDays: number;
     readonly targetDateText: string;
-    readonly timeDifference: TimeDifferenceText;
+    readonly now: Temporal.Instant;
+    readonly targetDate: Temporal.Instant;
     readonly theme: UrlParameter["theme"];
     readonly onMessageChange: (newMessage: string) => void;
     readonly onBaseDateChange: (newBaseDate: string) => void;
     readonly onPlusDaysChange: (newPlusDays: number) => void;
   },
 ) {
+  const duration = now.until(targetDate).round({
+    largestUnit: "day",
+    smallestUnit: "second",
+    roundingMode: "trunc",
+  });
+  const after = duration.sign < 0;
+  const normalizedDuration = after ? duration.negated() : duration;
+  const days = normalizedDuration.days;
+  const hours = normalizedDuration.hours;
+  const minutes = normalizedDuration.minutes;
+  const seconds = normalizedDuration.seconds;
+
   return (
     <div
       style={{
@@ -89,15 +103,14 @@ export function TimeDifferencePanel(
           }}
         >
           <div style={{ fontSize: 18, fontWeight: 700 }}>
-            「{targetDateText}」まで
+            「{targetDateText}」{after ? "から" : "まで"}
           </div>
           <div
             style={{ fontSize: 28, fontWeight: 800, letterSpacing: "0.04em" }}
           >
-            {timeDifference.after ? "経過" : "あと"} {timeDifference.days} 日
+            {after ? "" : "あと"} {days} 日 {hours} 時間 {minutes} 分 {seconds}
             {" "}
-            {timeDifference.hours} 時間 {timeDifference.minutes} 分{" "}
-            {timeDifference.seconds} 秒
+            秒 {after ? "経過" : ""}
           </div>
         </div>
       </div>
