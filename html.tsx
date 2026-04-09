@@ -40,6 +40,7 @@ export function Html(
             encodeUrlParams({ ...parameter, now: initialDate })
           }`}
         />
+        <meta name="twitter:card" content="summary_large_image" />
         <script type="module" src={scriptPath} />
       </head>
       <body style={{ height: "100%", margin: 0 }}>
