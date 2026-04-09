@@ -1,13 +1,5 @@
 import { UrlParameter } from "./url.ts";
 
-type TimeDifferenceText = {
-  readonly days: number;
-  readonly hours: number;
-  readonly minutes: number;
-  readonly seconds: number;
-  readonly after: boolean;
-};
-
 export function TimeDifferencePanel(
   {
     message,
@@ -71,6 +63,7 @@ export function TimeDifferencePanel(
           label="メッセージ"
           value={message}
           type="text"
+          name="message"
           textColor={theme.infoText}
           outlineColor={theme.infoOutline}
           onChange={onMessageChange}
@@ -79,6 +72,7 @@ export function TimeDifferencePanel(
           label="日付"
           value={baseDateText}
           type="date"
+          name="baseDate"
           textColor={theme.infoText}
           outlineColor={theme.infoOutline}
           onChange={onBaseDateChange}
@@ -87,6 +81,7 @@ export function TimeDifferencePanel(
           label="+ する日数"
           value={plusDays.toString()}
           type="number"
+          name="plusDays"
           textColor={theme.infoText}
           outlineColor={theme.infoOutline}
           onChange={(value) => {
@@ -119,10 +114,11 @@ export function TimeDifferencePanel(
 }
 
 function PanelField(
-  { label, value, type, outlineColor, onChange }: {
+  { label, value, type, name, outlineColor, onChange }: {
     readonly label: string;
     readonly value: string;
     readonly type: "text" | "date" | "number";
+    readonly name: string;
     readonly textColor: string;
     readonly outlineColor: string;
     readonly onChange: (value: string) => void;
@@ -138,9 +134,9 @@ function PanelField(
       <span style={{ fontSize: 14, fontWeight: 700 }}>{label}</span>
       <input
         type={type}
+        name={name}
         value={value}
         style={{
-          width: "100%",
           borderRadius: 14,
           color: "white",
           border: `1px solid ${outlineColor}`,

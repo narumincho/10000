@@ -30,6 +30,12 @@ export function Html(
           }`}
         /> */
         }
+        <meta
+          property="og:image"
+          content={`/og-image${
+            encodeUrlParams({ ...parameter, now: initialDate })
+          }`}
+        />
         <script type="module" src={scriptPath} />
       </head>
       <body style={{ height: "100%", margin: 0 }}>
