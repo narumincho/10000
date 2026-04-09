@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
-import { Clock24, clock24Title } from "./clock.tsx";
+import { Clock24 } from "./clock.tsx";
 import { renderClockIconSvgDataUrl } from "./icon_svg.tsx";
 import { encodeUrlParams, parseUrl } from "./url.ts";
 import type {} from "navigation-api-types";
@@ -18,19 +18,13 @@ function WithRouter() {
   );
 
   useEffect(() => {
-    document.title = clock24Title(parameter);
-
+    console.log("effect start!");
     setIconLink({
       type: "image/svg+xml",
       href: renderClockIconSvgDataUrl({
         parameter,
         now: Temporal.Instant.fromEpochMilliseconds(Date.now()),
       }),
-      sizes: "any",
-    });
-    setIconLink({
-      type: "image/png",
-      href: `/icon.png${encodeUrlParams(parameter)}`,
     });
     const timer = setInterval(() => {
       setIconLink({
@@ -39,7 +33,6 @@ function WithRouter() {
           parameter,
           now: Temporal.Instant.fromEpochMilliseconds(Date.now()),
         }),
-        sizes: "any",
       });
     }, 1000);
     return () => {
@@ -97,10 +90,9 @@ function WithRouter() {
 }
 
 function setIconLink(
-  { type, href, sizes }: {
+  { type, href }: {
     readonly type: string;
     readonly href: string;
-    readonly sizes?: string;
   },
 ) {
   let iconLink = document.head.querySelector<HTMLLinkElement>(
@@ -111,9 +103,6 @@ function setIconLink(
     iconLink.rel = "icon";
     iconLink.type = type;
     document.head.append(iconLink);
-  }
-  if (sizes) {
-    iconLink.sizes.value = sizes;
   }
   iconLink.href = href;
 }

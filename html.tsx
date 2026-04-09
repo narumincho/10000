@@ -17,14 +17,30 @@ export function Html(
         <link
           rel="icon"
           type="image/svg+xml"
-          sizes="any"
-          href={`/icon.svg${encodeUrlParams(parameter)}`}
+          href={`/icon.svg${
+            encodeUrlParams({ ...parameter, now: initialDate })
+          }`}
         />
-        <link
+        {
+          /* <link
           rel="icon"
           type="image/png"
-          href={`/icon.png${encodeUrlParams(parameter)}`}
+          href={`/icon.png${
+            encodeUrlParams({ ...parameter, now: initialDate })
+          }`}
+        /> */
+        }
+        <meta
+          name="description"
+          content={`${parameter.message} (${parameter.baseDate}) から ${parameter.plusDays} 日後まで...`}
         />
+        <meta
+          property="og:image"
+          content={`/og-image${
+            encodeUrlParams({ ...parameter, now: initialDate })
+          }`}
+        />
+        <meta name="twitter:card" content="summary_large_image" />
         <script type="module" src={scriptPath} />
       </head>
       <body style={{ height: "100%", margin: 0 }}>

@@ -72,7 +72,7 @@ server.on("request", (request, response) => {
             width: 256,
             height: 256,
             headers: {
-              "Cache-Control": "no-store, max-age=0",
+              "Cache-Control": "public, max-age=604800, immutable",
             },
           },
         );
@@ -111,7 +111,7 @@ server.on("request", (request, response) => {
           (await vite.ssrLoadModule("/client/url.ts")) as typeof urlModule;
         response.writeHead(200, {
           "Content-Type": "image/svg+xml; charset=utf-8",
-          "Cache-Control": "no-store, max-age=0",
+          "Cache-Control": "public, max-age=604800, immutable",
         });
         response.end(
           clockIconSvg.renderClockIconSvg({

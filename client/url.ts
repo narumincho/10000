@@ -15,6 +15,9 @@ export type UrlParameter = {
   readonly message: string;
   readonly timezone: string | undefined;
   readonly targetDate: Temporal.Instant | undefined;
+  readonly timeDifferenceVisible: boolean;
+  readonly baseDate: string | undefined;
+  readonly plusDays: number;
   readonly theme: ClockTheme;
   readonly handDesigns: HandDesigns;
   readonly oddHourNumberDisplay: OddHourNumberDisplay;
@@ -26,6 +29,9 @@ export function parseUrl(url: URL): UrlParameter {
     timezone: url.searchParams.get("timezone") ?? undefined,
     targetDate: tryParseTemporalInstant(url.searchParams.get("date")) ??
       undefined,
+    timeDifferenceVisible: url.searchParams.get("diff") !== "hidden",
+    baseDate: url.searchParams.get("baseDate") ?? undefined,
+    plusDays: tryParseInteger(url.searchParams.get("plusDays")) ?? 0,
     theme: {
       background: url.searchParams.get("bg") ?? defaultTheme.background,
       dialStroke: url.searchParams.get("dialStroke") ?? defaultTheme.dialStroke,
@@ -79,13 +85,26 @@ function tryParseTemporalInstant(
 }
 
 export function encodeUrlParams(
-  { message, timezone, targetDate, theme, handDesigns, oddHourNumberDisplay }:
-    UrlParameter,
+  {
+    message,
+    timezone,
+    targetDate,
+    timeDifferenceVisible,
+    baseDate,
+    plusDays,
+    theme,
+    handDesigns,
+    oddHourNumberDisplay,
+    now,
+  }: UrlParameter & { now?: Temporal.Instant },
 ): string {
   return `?${new URLSearchParams({
     ...(message ? { message } : {}),
     ...(timezone ? { timezone } : {}),
     ...(targetDate ? { date: targetDate.toString() } : {}),
+    ...(!timeDifferenceVisible ? { diff: "hidden" } : {}),
+    ...(baseDate ? { baseDate } : {}),
+    ...(plusDays !== 0 ? { plusDays: plusDays.toString() } : {}),
     bg: theme.background,
     dialStroke: theme.dialStroke,
     dialFill: theme.dialFill,
@@ -99,6 +118,7 @@ export function encodeUrlParams(
     minuteHandDesign: handDesigns.minute,
     secondHandDesign: handDesigns.second,
     oddHourNumber: oddHourNumberDisplay,
+    ...(now ? { now: now.toString() } : {}),
   })}`;
 }
 
@@ -111,4 +131,15 @@ function parseEnum<T extends string>(
     return value as T;
   }
   return fallback;
+}
+
+function tryParseInteger(value: string | null): number | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const parsed = Number.parseInt(value, 10);
+  if (Number.isNaN(parsed)) {
+    return undefined;
+  }
+  return parsed;
 }

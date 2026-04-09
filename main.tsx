@@ -4,6 +4,7 @@ import { Html } from "./html.tsx";
 import { ClockIconPng } from "./client/icon_png.tsx";
 import { renderClockIconSvg } from "./client/icon_svg.tsx";
 import { parseUrl } from "./client/url.ts";
+import { createOgImage, OgpImage } from "./client/ogp_image.tsx";
 
 const scriptName = (await Array.fromAsync(Deno.readDir("./dist/assets")))[0];
 
@@ -35,27 +36,14 @@ export default {
           headers: { "Content-Type": "application/javascript; charset=utf-8" },
         });
       case "/og-image":
-        return new ImageResponse(
-          (
-            <div
-              style={{
-                fontSize: 40,
-                color: "black",
-                background: "white",
-                width: "100%",
-                height: "100%",
-                padding: "50px 200px",
-                textAlign: "center",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              👋 10000日の誕生日は...?
-            </div>
+        return createOgImage(url);
+      case "/og-image.html":
+        return new Response(
+          await renderToReadableStream(
+            <OgpImage url={url} />,
           ),
           {
-            width: 1200,
-            height: 630,
+            headers: { "Content-Type": "text/html; charset=utf-8" },
           },
         );
       case "/icon.png":
@@ -70,7 +58,7 @@ export default {
             width: 256,
             height: 256,
             headers: {
-              "Cache-Control": "no-store, max-age=0",
+              "Cache-Control": "public, max-age=604800, immutable",
             },
           },
         );
@@ -83,7 +71,7 @@ export default {
           {
             headers: {
               "Content-Type": "image/svg+xml; charset=utf-8",
-              "Cache-Control": "no-store, max-age=0",
+              "Cache-Control": "public, max-age=604800, immutable",
             },
           },
         );
