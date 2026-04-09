@@ -1,3 +1,4 @@
+import "./temporal_polyfill.ts";
 import { useEffect, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { Clock24 } from "./clock.tsx";
