@@ -15,6 +15,7 @@ export type UrlParameter = {
   readonly message: string;
   readonly timezone: string | undefined;
   readonly targetDate: Temporal.Instant | undefined;
+  readonly timeDifferenceVisible: boolean;
   readonly theme: ClockTheme;
   readonly handDesigns: HandDesigns;
   readonly oddHourNumberDisplay: OddHourNumberDisplay;
@@ -26,6 +27,7 @@ export function parseUrl(url: URL): UrlParameter {
     timezone: url.searchParams.get("timezone") ?? undefined,
     targetDate: tryParseTemporalInstant(url.searchParams.get("date")) ??
       undefined,
+    timeDifferenceVisible: url.searchParams.get("diff") !== "hidden",
     theme: {
       background: url.searchParams.get("bg") ?? defaultTheme.background,
       dialStroke: url.searchParams.get("dialStroke") ?? defaultTheme.dialStroke,
@@ -79,13 +81,21 @@ function tryParseTemporalInstant(
 }
 
 export function encodeUrlParams(
-  { message, timezone, targetDate, theme, handDesigns, oddHourNumberDisplay }:
-    UrlParameter,
+  {
+    message,
+    timezone,
+    targetDate,
+    timeDifferenceVisible,
+    theme,
+    handDesigns,
+    oddHourNumberDisplay,
+  }: UrlParameter,
 ): string {
   return `?${new URLSearchParams({
     ...(message ? { message } : {}),
     ...(timezone ? { timezone } : {}),
     ...(targetDate ? { date: targetDate.toString() } : {}),
+    ...(!timeDifferenceVisible ? { diff: "hidden" } : {}),
     bg: theme.background,
     dialStroke: theme.dialStroke,
     dialFill: theme.dialFill,

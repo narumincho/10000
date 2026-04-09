@@ -72,6 +72,7 @@ export function Clock24WithTimezone(
 
   const { message, targetDate, theme, handDesigns, oddHourNumberDisplay } =
     parameter;
+  const { timeDifferenceVisible } = parameter;
   const { timezone } = parameter;
   const zonedNow = now.toZonedDateTimeISO(timezone);
   const elapsedMillisecondsOfDay =
@@ -172,7 +173,7 @@ export function Clock24WithTimezone(
             onChangeUrl({ ...parameter, message: newMessage });
           }}
         />
-        {limitValueAndUnit && (
+        {timeDifferenceVisible && limitValueAndUnit && (
           <text
             x={0}
             y={-10}
@@ -237,6 +238,38 @@ export function Clock24WithTimezone(
       </svg>
       <button
         type="button"
+        aria-label={timeDifferenceVisible
+          ? "時間差の表示を隠す"
+          : "時間差の表示を出す"}
+        onClick={() => {
+          onChangeUrl({
+            ...parameter,
+            timeDifferenceVisible: !timeDifferenceVisible,
+          });
+        }}
+        style={{
+          position: "absolute",
+          left: 24,
+          bottom: 24,
+          width: 56,
+          height: 56,
+          borderRadius: "50%",
+          border: "1px solid rgba(255, 255, 255, 0.35)",
+          background: timeDifferenceVisible
+            ? "rgba(20, 16, 16, 0.82)"
+            : "rgba(20, 16, 16, 0.62)",
+          color: "#ffffff",
+          display: "grid",
+          placeItems: "center",
+          cursor: "pointer",
+          boxShadow: "0 10px 25px rgba(0, 0, 0, 0.25)",
+          backdropFilter: "blur(6px)",
+        }}
+      >
+        <TimeDifferenceIcon active={timeDifferenceVisible} />
+      </button>
+      <button
+        type="button"
         aria-label={isDesignMode
           ? "デザイン編集モードを閉じる"
           : "デザイン編集モードを開く"}
@@ -268,6 +301,78 @@ export function Clock24WithTimezone(
         </svg>
       </button>
     </div>
+  );
+}
+
+function TimeDifferenceIcon({ active }: { readonly active: boolean }) {
+  const accentColor = active ? "#FAE080" : "rgba(255, 255, 255, 0.72)";
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+      <circle
+        cx="7"
+        cy="8"
+        r="3.25"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M7 6.4v1.9l1.25.75"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle
+        cx="17"
+        cy="16"
+        r="3.25"
+        fill="none"
+        stroke={accentColor}
+        strokeWidth="1.5"
+      />
+      <path
+        d="M17 14.4v1.9l1.25.75"
+        fill="none"
+        stroke={accentColor}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10.5 15.5h3.8"
+        fill="none"
+        stroke={accentColor}
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M12.6 13.4 14.8 15.5 12.6 17.6"
+        fill="none"
+        stroke={accentColor}
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M13.5 8.5H9.7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        opacity={active ? 0.55 : 0.95}
+      />
+      <path
+        d="M11.4 6.4 9.2 8.5 11.4 10.6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={active ? 0.55 : 0.95}
+      />
+    </svg>
   );
 }
 
