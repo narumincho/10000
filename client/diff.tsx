@@ -34,10 +34,9 @@ export function TimeDifferencePanel(
   return (
     <div
       style={{
-        minHeight: "100%",
+        height: "100%",
         display: "grid",
         placeItems: "center",
-        padding: "32px 24px 96px",
         color: "white",
       }}
     >
