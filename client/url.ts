@@ -95,7 +95,8 @@ export function encodeUrlParams(
     theme,
     handDesigns,
     oddHourNumberDisplay,
-  }: UrlParameter,
+    now,
+  }: UrlParameter & { now?: Temporal.Instant },
 ): string {
   return `?${new URLSearchParams({
     ...(message ? { message } : {}),
@@ -117,6 +118,7 @@ export function encodeUrlParams(
     minuteHandDesign: handDesigns.minute,
     secondHandDesign: handDesigns.second,
     oddHourNumber: oddHourNumberDisplay,
+    ...(now ? { now: now.toString() } : {}),
   })}`;
 }
 

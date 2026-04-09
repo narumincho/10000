@@ -17,14 +17,19 @@ export function Html(
         <link
           rel="icon"
           type="image/svg+xml"
-          sizes="any"
-          href={`/icon.svg${encodeUrlParams(parameter)}`}
+          href={`/icon.svg${
+            encodeUrlParams({ ...parameter, now: initialDate })
+          }`}
         />
-        <link
+        {
+          /* <link
           rel="icon"
           type="image/png"
-          href={`/icon.png${encodeUrlParams(parameter)}`}
-        />
+          href={`/icon.png${
+            encodeUrlParams({ ...parameter, now: initialDate })
+          }`}
+        /> */
+        }
         <script type="module" src={scriptPath} />
       </head>
       <body style={{ height: "100%", margin: 0 }}>

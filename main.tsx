@@ -70,7 +70,7 @@ export default {
             width: 256,
             height: 256,
             headers: {
-              "Cache-Control": "no-store, max-age=0",
+              "Cache-Control": "public, max-age=604800, immutable",
             },
           },
         );
@@ -83,7 +83,7 @@ export default {
           {
             headers: {
               "Content-Type": "image/svg+xml; charset=utf-8",
-              "Cache-Control": "no-store, max-age=0",
+              "Cache-Control": "public, max-age=604800, immutable",
             },
           },
         );
