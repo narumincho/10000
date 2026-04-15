@@ -31,7 +31,7 @@ export function parseUrl(url: URL): UrlParameter {
       undefined,
     timeDifferenceVisible: url.searchParams.get("diff") !== "hidden",
     baseDate: url.searchParams.get("baseDate") ?? undefined,
-    plusDays: tryParseInteger(url.searchParams.get("plusDays")) ?? 0,
+    plusDays: tryParseInteger(url.searchParams.get("plusDays")) ?? 10000,
     theme: {
       background: url.searchParams.get("bg") ?? defaultTheme.background,
       dialStroke: url.searchParams.get("dialStroke") ?? defaultTheme.dialStroke,
